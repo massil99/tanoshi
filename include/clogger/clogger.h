@@ -223,7 +223,7 @@ void clogger_quit(){
 		struct message* l = dequeue();
 		free(l);
 	}
-	if(output_file != stdout);
+	if(output_file != stdout)
 		fclose(output_file);
 }
 

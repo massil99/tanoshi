@@ -3,7 +3,9 @@
 
 
 #include <stdbool.h>
+#include "log-manager.h"
 
-bool setup(void);
+bool tshInit(void);
+void tshQuit(void);
 
 #endif //_MASTER_MANAGER_H
