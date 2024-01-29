@@ -8,13 +8,13 @@ int main(int argc, char *argv[]){
 
     tshInit();
 
-    int i = 100000000;
-    while(--i);
+    // int i = 100000000;
+    // while(--i);
 
+    tshPrintLogs();
 
     LOG_INFO("hello");
 
-    tshPrintLogs();
     tshPrintLogs();
 
     tshQuit();
