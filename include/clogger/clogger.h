@@ -216,6 +216,8 @@ void flush_queue(){
 		fprintf(output_file, "%s\n", l->content);
 		free(l);
 	}
+
+    q.last = NULL;
 }
 
 void clogger_quit(){
