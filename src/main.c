@@ -15,7 +15,6 @@ int main(int argc, char *argv[]){
     LOG_INFO("hello");
 
     tshPrintLogs();
-    tshPrintLogs();
 
     tshQuit();
 
