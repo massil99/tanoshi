@@ -28,8 +28,6 @@ i32 getMasterBufferSize(i32 BuffSize){
 }
 
 void linear_allocator() {
-    int a = 3;
-    a++;
 }
 
 void* tshPAalloc(size_t size, i8* filename, u16 line) {
