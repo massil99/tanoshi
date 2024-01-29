@@ -1,9 +1,15 @@
 
+#include "../include/tanoshi/master-manager.h"
 
-#include <stdbool.h>
 
-
-bool setup(void){
+bool tshInit(void){
+    tshInitLogManger();
+    LOG_INFO("Tanoshi engine startup");
 
     return true;
+}
+
+void tshQuit(void){
+    LOG_INFO("Tanoshi engine shuting down");
+    tshQuitLogManger();
 }

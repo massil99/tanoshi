@@ -1,6 +1,6 @@
 
+#include <stdlib.h>
 #include "../include/tanoshi/memory-allocator.h"
-#include "../include/tanoshi/custom-types.h"
 #include "../include/clogger/clogger.h"
 
 i8* masterBuffer;
@@ -24,11 +24,12 @@ void setMasterBufferSize(i32 BuffSize){
  * @return {i32} master buffer size
  */
 i32 getMasterBufferSize(i32 BuffSize){
-    tshMasterBufferSize = BuffSize;
+    return tshMasterBufferSize;
 }
 
 void linear_allocator() {
-
+    int a = 3;
+    a++;
 }
 
 void* tshPAalloc(size_t size, i8* filename, u16 line) {
