@@ -1,14 +1,15 @@
 #ifndef CLOGGER_H_
 #define CLOGGER_H_
 
-#define FATAL_PREFIX "\033[1;31m[FTL]: \033[0m"
-#define ERROR_PREFIX "\033[1;31m[ERR]: \033[0m"
-#define WARN_PREFIX  "\033[1;33m[WAR]: \033[0m"
-#define INFO_PREFIX  "\033[1;37m[INF]: \033[0m"
-#define DEBUG_PREFIX "\033[1;36m[DBG]: \033[0m"
-#define TRACE_PREFIX "\033[1;35m[TRC]: \033[0m"
+
+#define FATAL_PREFIX "\033[1;31m[FATAL]: \033[0m"
+#define ERROR_PREFIX "\033[1;31m[ERROR]: \033[0m"
+#define WARN_PREFIX  "\033[1;33m[WARN]: \033[0m"
+#define INFO_PREFIX  "\033[1;37m[INFO]: \033[0m"
+#define DEBUG_PREFIX "\033[1;36m[DEBUG]: \033[0m"
+#define TRACE_PREFIX "\033[1;35m[TRACE]: \033[0m"
 #define GRAY_TEXT(m)\
-	   "\033[1;90m"m"\033[1;0m "
+	   "\033[1;90m" m "\033[1;0m "
 
 
 void clogger_init(char *file_name, int showTimestamp);
@@ -69,18 +70,18 @@ char* get_date_time(){
 	   time_t rawtime = time(NULL);
 	   if (rawtime == -1) {
 			 fprintf(stderr, "The time() function failed");
-			 exit(1);
+			 return "";
 	   }
 
 	   struct tm *ptm = localtime(&rawtime);
 	   if (ptm == NULL) {
 			 fprintf(stderr, "The localtime() function failed");
-			 exit(1);
+			 return "";
 	   }
 
 	   char *res = malloc(sizeof(char) * 256);
 	   if(style)
-			 sprintf(res, "\033[1m[%04d-%02d-%02d %02d:%02d:%02d]\033[0m", ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+			 sprintf(res, "\033[1;90m[%04d-%02d-%02d %02d:%02d:%02d]\033[0;37m", ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
 	   else
 			 sprintf(res, "[%04d-%02d-%02d %02d:%02d:%02d]", ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
 	   return res;
@@ -112,80 +113,87 @@ void queue_up(char *msg, va_list args){
 }
 
 void LOG_FATAL(char *m, ...){
-	   va_list args;
-	   va_start(args, m);
-	   if(style){
-			 char temp[256] = "";
-			 strcat(temp, FATAL_PREFIX);
-			 queue_up(strcat(temp, m), args);
-	   }else{
-			 char temp[256] = "";
-			 strcat(temp, "[FTL]: ");
-			 queue_up(strcat(temp, m), args);
-	   }
+	va_list args;
+	va_start(args, m);
 
-	   va_end(args);
+	if(style){
+	 	 char temp[256] = "";
+	 	 strcat(temp, FATAL_PREFIX);
+	 	 queue_up(strcat(temp, m), args);
+	}else{
+	 	 char temp[256] = "";
+	 	 strcat(temp, "[FTL]: ");
+	 	 queue_up(strcat(temp, m), args);
+	}
+
+	va_end(args);
+    flush_queue();
 }
 
 void LOG_ERROR(char *m, ...){
-	   va_list args;
-	   va_start(args, m);
-	   if(style){
-			 char temp[256] = "";
-			 strcat(temp, ERROR_PREFIX);
-			 queue_up(strcat(temp, m), args);
-	   }else{
-			 char temp[256] = "";
-			 strcat(temp, "[ERR]: ");
-			 queue_up(strcat(temp, m), args);
-	   }
+	va_list args;
+	va_start(args, m);
 
-	   va_end(args);
+	if(style){
+	 	 char temp[256] = "";
+	 	 strcat(temp, ERROR_PREFIX);
+	 	 queue_up(strcat(temp, m), args);
+	}else{
+	 	 char temp[256] = "";
+	 	 strcat(temp, "[ERR]: ");
+	 	 queue_up(strcat(temp, m), args);
+	}
+
+	va_end(args);
+    flush_queue();
 }
 
 void LOG_WARN(char *m, ...){
-	   va_list args;
-	   va_start(args, m);
-	   if(style){
-			 char temp[256] = "";
-			 strcat(temp, WARN_PREFIX);
-			 queue_up(strcat(temp, m), args);
-	   }else{
-			 char temp[256] = "";
-			 strcat(temp, "[WRN]: ");
-			 queue_up(strcat(temp, m), args);
-	   }
-	   va_end(args);
+	va_list args;
+	va_start(args, m);
+	if(style){
+	 	 char temp[256] = "";
+	 	 strcat(temp, WARN_PREFIX);
+	 	 queue_up(strcat(temp, m), args);
+	}else{
+	 	 char temp[256] = "";
+	 	 strcat(temp, "[WRN]: ");
+	 	 queue_up(strcat(temp, m), args);
+	}
+	va_end(args);
+    flush_queue();
 }
 
 void LOG_INFO(char *m, ...){
-	   va_list args;
-	   va_start(args, m);
-	   if(style){
-			 char temp[256] = "";
-			 strcat(temp, INFO_PREFIX);
-			 queue_up(strcat(temp, m), args);
-	   }else{
-			 char temp[256] = "";
-			 strcat(temp, "[INF]: ");
-			 queue_up(strcat(temp, m), args);
-	   }
-	   va_end(args);
+	va_list args;
+	va_start(args, m);
+	if(style){
+	 	 char temp[256] = "";
+	 	 strcat(temp, INFO_PREFIX);
+	 	 queue_up(strcat(temp, m), args);
+	}else{
+	 	 char temp[256] = "";
+	 	 strcat(temp, "[INF]: ");
+	 	 queue_up(strcat(temp, m), args);
+	}
+	va_end(args);
+    flush_queue();
 }
 
 void LOG_DEBUG(char *m, ...){
-	   va_list args;
-	   va_start(args, m);
-	   if(style){
-			 char temp[256] = "";
-			 strcat(temp, DEBUG_PREFIX);
-			 queue_up(strcat(temp, m), args);
-	   }else{
-			 char temp[256] = "";
-			 strcat(temp, "[DBG]: ");
-			 queue_up(strcat(temp, m), args);
-	   }
-	   va_end(args);
+    va_list args;
+    va_start(args, m);
+    if(style){
+     	 char temp[256] = "";
+     	 strcat(temp, DEBUG_PREFIX);
+     	 queue_up(strcat(temp, m), args);
+    }else{
+     	 char temp[256] = "";
+     	 strcat(temp, "[DBG]: ");
+     	 queue_up(strcat(temp, m), args);
+    }
+    va_end(args);
+    flush_queue();
 }
 
 void LOG_TRACE(char *m, ...){
@@ -201,6 +209,7 @@ void LOG_TRACE(char *m, ...){
 			 queue_up(strcat(temp, m), args);
 	   }
 	va_end(args);
+    flush_queue();
 }
 
 struct message* dequeue(){
