@@ -285,11 +285,12 @@ uintptr_t __tshStackAllocate(tshStackAllocator *allocator, size_t size){
 uintptr_t tshStackFree(tshStackAllocator *allocator){
     if((i32)allocator->stackBaseAddress >= (i32)allocator->stackHeadAddress){
         LOG_WARN("[MEM]: Attempting to free from an empty stack allocator");
+        return 0;
     } else {
-        uintptr_t *prev_marker = (uintptr_t *) (allocator->stackHeadAddress - sizeof(uintptr_t));
+        uintptr_t *prev_marker = (uintptr_t *)(allocator->stackHeadAddress - sizeof(uintptr_t));
         allocator->stackHeadAddress = *prev_marker;
+        return allocator->stackHeadAddress;
     }
-    return allocator->stackBaseAddress;
 }
 
 

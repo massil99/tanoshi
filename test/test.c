@@ -1,5 +1,6 @@
 #include "tau/tau.h"
 #include "../include/tanoshi/memory-allocator.h"
+#include "../include/clogger/clogger.h"
 #include "../include/tanoshi/custom_types.h"
 #include <stdint.h>
 
@@ -12,17 +13,18 @@ void test_stack_allocator() {
     u32* a = (u32*)__tshStackAllocate(&st, 4); 
     *a = 69;
     CHECK(*a == 69);
-    CHECK(st.stackBaseAddress != st.stackHeadAddress);
 
     uintptr_t a1 = __tshStackAllocate(&st, 4); 
-    uintptr_t a2 = __tshStackAllocate(&st, 4); 
+    u32* a2 = (u32*)__tshStackAllocate(&st, 4); 
+    *a2 = 420;
+    CHECK(*a2 == 420);
 
     uintptr_t addr = tshStackFree(&st); 
-    CHECK(addr = a2);
+    CHECK(addr == a1);
     addr = tshStackFree(&st); 
-    CHECK(addr = a1);
+    CHECK(addr == (uintptr_t)a);
     addr = tshStackFree(&st); 
-    CHECK(addr = st.stackBaseAddress);
+    CHECK(addr == 0);
     CHECK(st.stackBaseAddress == st.stackHeadAddress);
 
     free((void*)start);
