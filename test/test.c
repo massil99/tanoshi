@@ -10,22 +10,38 @@ void test_stack_allocator() {
     size_t size = 70;
 
     tshInitStackAllocator(&st, start,  size);
-    u32* a = (u32*)__tshStackAllocate(&st, 4); 
-    *a = 69;
-    CHECK(*a == 69);
 
-    uintptr_t a1 = __tshStackAllocate(&st, 4); 
-    u32* a2 = (u32*)__tshStackAllocate(&st, 4); 
-    *a2 = 420;
-    CHECK(*a2 == 420);
+    CHECK_EQ(st.stackBaseAddress, start);
+    CHECK_EQ(st.stackBaseAddress, st.stackHeadAddress);
+    u16* addr = tshStackAllocate(&st, sizeof(u16),u16*);
+    *addr = 1;
+    CHECK_EQ(*addr, 1);
+    addr = tshStackAllocate(&st, sizeof(u16),u16*);
+    *addr = 2;
+    CHECK_EQ(*addr, 2);
+    addr = tshStackAllocate(&st, sizeof(u16),u16*);
+    *addr = 3;
+    CHECK_EQ(*addr, 3);
+    addr = tshStackAllocate(&st, sizeof(u16),u16*);
+    *addr = 4;
+    CHECK_EQ(*addr, 4);
 
-    uintptr_t addr = tshStackFree(&st); 
-    CHECK(addr == a1);
-    addr = tshStackFree(&st); 
-    CHECK(addr == (uintptr_t)a);
-    addr = tshStackFree(&st); 
-    CHECK(addr == 0);
-    CHECK(st.stackBaseAddress == st.stackHeadAddress);
+    tshStackFree(&st);
+    CHECK_EQ(*(u16*)(st.stackHeadAddress), 4);
+    tshStackFree(&st);
+    CHECK_EQ(*(u16*)(st.stackHeadAddress), 3);
+    tshStackFree(&st);
+    CHECK_EQ(*(u16*)(st.stackHeadAddress), 2);
+    tshStackFree(&st);
+    CHECK_EQ(*(u16*)(st.stackHeadAddress), 1);
+    tshStackFree(&st);
+    CHECK_EQ(*(u16*)(st.stackHeadAddress), 1);
+
+    addr = tshStackAllocate(&st, sizeof(u16)*30, u16*);
+    *addr = 0x69;
+    CHECK_EQ(*addr, 0x69);
+    addr = tshStackAllocate(&st, sizeof(u16), u16*);
+    CHECK_EQ((uintptr_t)addr, 0);
 
     free((void*)start);
 }

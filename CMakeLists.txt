@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.3)
 
 set(PROJECT_NAME "tanoshi")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
+project(${PROJECT_NAME} C)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -g \
     -Wall \
     -Werror \
 ")
-
-project(${PROJECT_NAME} C)
 
 file(GLOB
     SOURCE_FILES
@@ -16,8 +16,11 @@ file(GLOB
     ${CMAKE_SOURCE_DIR}/src/memory/*
 )
 
-message("source files= ${SOURCE_FILES}")
-if(TARGET_BUILD STREQUAL "build")
+if(TARGET_BUILD STREQUAL "debug")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
+        -O0 \
+    ")
+
     list(APPEND SOURCE_FILES 
         ${CMAKE_SOURCE_DIR}/src/main.c
     )
@@ -27,6 +30,7 @@ if(TARGET_BUILD STREQUAL "build")
         ${SOURCE_FILES}
     )
 elseif(TARGET_BUILD STREQUAL "test")
+
     list(APPEND SOURCE_FILES 
         ${CMAKE_SOURCE_DIR}/test/test.c
     )

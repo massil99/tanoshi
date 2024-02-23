@@ -2,7 +2,7 @@
 #include "../../include/tanoshi/memory-allocator.h"
 #include "../../include/clogger/clogger.h"
 #include <stdint.h>
-#include <sys/types.h>
+#include <stdio.h>
 
 uintptr_t tshMasterBuffer;
 
@@ -35,36 +35,37 @@ bool tshInitAllocators(u32 master_buff_size){
     // tshStackAllocator stAllocator;
     // tshInitStackAllocator(&stAllocator, tshMasterBuffer, 100);
     //
-    // u16* addr = (u16*) tshStackAllocate(&stAllocator, sizeof(u16));
+    // u16* addr = tshStackAllocate(&stAllocator, sizeof(u16), u16*);
     //
+    // *addr = 1;
+    // LOG_DEBUG("*addr = %d ", *addr);
+    // addr = tshStackAllocate(&stAllocator, sizeof(u16)*3, u16*);
+    // *addr = 2;
+    // addr = tshStackAllocate(&stAllocator, sizeof(u16), u16*);
+    // *addr = 3;
+    // tshStackFree(&stAllocator);
+    // tshStackFree(&stAllocator);
+    // addr = tshStackAllocate(&stAllocator, sizeof(u16), u16*);
     // *addr = 4;
-    // LOG_DEBUG("*addr = %d ", *addr);
-    // addr = (u16*) tshStackAllocate(&stAllocator, sizeof(u16));
-    // *addr = 12;
-    // LOG_DEBUG("*addr = %d ", *addr);
-    // addr = (u16*)tshStackFree(&stAllocator);
-    // LOG_DEBUG("*addr = %ld ", *addr);
-    // addr = (u16*) tshStackFree(&stAllocator);
-    // LOG_DEBUG("*addr = %ld ", *addr);
     // tshStackFree(&stAllocator); 
     /****************************************************************/
-    tshDynamicAllocator dAlloc;  
-
-    tshInitDynamicAllocator(&dAlloc, tshMasterBuffer, 100);
-
-    
-    i32 *val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
-    *val = 0xff; 
-    i32 *todel = tshDynamicAllocate(&dAlloc, sizeof(i32)*4, i32*);
-    *todel = 0xdd; 
-    val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
-    *val = 0xcc; 
-    tshDynamicFree(&dAlloc, (uintptr_t) todel);
-    val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
-    *val = 0xee; 
-    val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
-    *val = 0xaa; 
-    val = tshDynamicAllocate(&dAlloc, sizeof(i32)*2, i32*);
+    // tshDynamicAllocator dAlloc;  
+    //
+    // tshInitDynamicAllocator(&dAlloc, tshMasterBuffer, 100);
+    //
+    //
+    // i32 *val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
+    // *val = 0xff; 
+    // i32 *todel = tshDynamicAllocate(&dAlloc, sizeof(i32)*4, i32*);
+    // *todel = 0xdd; 
+    // val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
+    // *val = 0xcc; 
+    // tshDynamicFree(&dAlloc, (uintptr_t) todel);
+    // val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
+    // *val = 0xee; 
+    // val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
+    // *val = 0xaa; 
+    // val = tshDynamicAllocate(&dAlloc, sizeof(i32)*2, i32*);
 
     /****************************************************************/
     return true;
@@ -258,14 +259,14 @@ uintptr_t tshLineareAllocate(tshLineareAllocator *allocator, size_t size) {
  */
 void tshInitStackAllocator(tshStackAllocator *allocator, uintptr_t start, size_t size) {
     allocator->stackBaseAddress = start;
-    allocator->stackHeadAddress = start;
+    allocator->stackHeadAddress = allocator->stackBaseAddress;
     allocator->capacity = size;
 }
 
 
 uintptr_t __tshStackAllocate(tshStackAllocator *allocator, size_t size){
     uintptr_t addr = allocator->stackHeadAddress;
-    if((i32)(addr - allocator->stackBaseAddress - 1) > (i32)(allocator->capacity - size)){
+    if((i32)(addr - allocator->stackBaseAddress - 1) > (i32)(allocator->capacity - (size + UINTPTR_SIZE))){
         LOG_ERROR("Not enough memory");
         return 0;
     }
@@ -275,21 +276,18 @@ uintptr_t __tshStackAllocate(tshStackAllocator *allocator, size_t size){
 
     uintptr_t *tmp = (uintptr_t*)allocator->stackHeadAddress;
     *tmp = prev_marker;
-    allocator->stackHeadAddress += sizeof(uintptr_t);
+    allocator->stackHeadAddress += UINTPTR_SIZE;
 
     return addr;
 }
 
-
 // void __tshStackFree(tshStackAllocator *allocator, char* filename, u16 line){
-uintptr_t tshStackFree(tshStackAllocator *allocator){
+void tshStackFree(tshStackAllocator *allocator){
     if((i32)allocator->stackBaseAddress >= (i32)allocator->stackHeadAddress){
         LOG_WARN("[MEM]: Attempting to free from an empty stack allocator");
-        return 0;
     } else {
-        uintptr_t *prev_marker = (uintptr_t *)(allocator->stackHeadAddress - sizeof(uintptr_t));
+        uintptr_t *prev_marker = (uintptr_t *)(allocator->stackHeadAddress - UINTPTR_SIZE);
         allocator->stackHeadAddress = *prev_marker;
-        return allocator->stackHeadAddress;
     }
 }
 
