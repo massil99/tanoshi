@@ -38,25 +38,31 @@ bool tshDynamicFree(tshDynamicAllocator* allocator, uintptr_t addr);
     (type)__tshDynamicAllocate(allocator, size)
 
 
-// Lineare allocator
-typedef struct tsh_lineare_allocator {
+// Linear allocator
+typedef struct tsh_linear_allocator {
     uintptr_t baseAddress;
     size_t capacity;
     u32 offset;
-} tshLineareAllocator;
+} tshLinearAllocator;
 
+#define tshLinearAllocate(allocator, size, type)\
+    (type)__tshLinearAllocate(allocator, size)
+
+void tshInitLinearAllocator(tshLinearAllocator *allocator, uintptr_t baseAddr, size_t size);
+uintptr_t __tshLinearAllocate(tshLinearAllocator *allocator, size_t size);
 
 // Stack allocator
 typedef struct tsh_stack_allocator {
     uintptr_t stackBaseAddress;
     uintptr_t stackHeadAddress;
     u32 capacity;
+    bool bottomTop;
 } tshStackAllocator;
 
 #define tshStackAllocate(allocator, size, type) \
     (type)__tshStackAllocate(allocator, size)
 
-void tshInitStackAllocator(tshStackAllocator* allocator, uintptr_t start, size_t size);
+void tshInitStackAllocator(tshStackAllocator *allocator, uintptr_t start, size_t size, bool direction);
 uintptr_t __tshStackAllocate(tshStackAllocator *allocator, size_t size);
 void tshStackFree(tshStackAllocator *allocator);
 

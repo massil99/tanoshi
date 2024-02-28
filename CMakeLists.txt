@@ -3,11 +3,15 @@ cmake_minimum_required(VERSION 3.3)
 set(PROJECT_NAME "tanoshi")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
+message("BUILD TYPE = ${CMAKE_BUILD_TYPE}")
 project(${PROJECT_NAME} C)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
-    -g \
     -Wall \
     -Werror \
+")
+
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} \
+    -g\
 ")
 
 file(GLOB
@@ -17,22 +21,16 @@ file(GLOB
 )
 
 if(TARGET_BUILD STREQUAL "debug")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
-        -O0 \
-    ")
-
     list(APPEND SOURCE_FILES 
         ${CMAKE_SOURCE_DIR}/src/main.c
     )
-
     add_executable(
         ${PROJECT_NAME}
         ${SOURCE_FILES}
     )
 elseif(TARGET_BUILD STREQUAL "test")
-
     list(APPEND SOURCE_FILES 
-        ${CMAKE_SOURCE_DIR}/test/test.c
+        ${CMAKE_SOURCE_DIR}/test/main_test.c
     )
 
     include(FetchContent)
@@ -54,4 +52,3 @@ elseif(TARGET_BUILD STREQUAL "test")
         Tau
     )
 endif()
-
