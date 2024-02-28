@@ -1,11 +1,21 @@
 #include "tau/tau.h"
 #include "../include/tanoshi/memory-allocator.h"
+#include "../include/tanoshi/log-manager.h"
 #include "../include/clogger/clogger.h"
 #include <stdint.h>
-#include <stdio.h>
 
+void init(){
+    tshInitLogManger();
+}
+void quit(){
+    tshQuitLogManger();
+}
+
+
+TAU_MAIN()
 
 TEST(memory, forward_stack_allocator) { 
+    init();
     uintptr_t start = (uintptr_t)malloc(100);
     size_t size = 70;
     bool dir = true;
@@ -45,9 +55,11 @@ TEST(memory, forward_stack_allocator) {
     CHECK_EQ((uintptr_t)addr, 0);
 
     free((void*)start);
+    quit();
 }
 
 TEST(memory, backward_stack_allocator) { 
+    init();
     uintptr_t start = (uintptr_t)malloc(100);
     size_t size = 70;
     tshStackAllocator st;
@@ -88,9 +100,11 @@ TEST(memory, backward_stack_allocator) {
     CHECK_EQ((uintptr_t)addr, 0);
 
     free((void*)start);
+    quit();
 }
 
 TEST(memory, linear_allocator) { 
+    init();
     tshLinearAllocator li;
     uintptr_t start = (uintptr_t)malloc(100);
     size_t size = 70;
@@ -110,8 +124,6 @@ TEST(memory, linear_allocator) {
     CHECK_EQ((uintptr_t)addr, 0); 
 
     free((void*) start);
+    quit();
 }
-
-
-TAU_MAIN()
 
