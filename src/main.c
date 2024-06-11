@@ -1,19 +1,14 @@
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "../include/tanoshi/master-manager.h"
 
 
 int main(int argc, char *argv[]){
-
     tshInit();
 
-    // int i = 100000000;
-    // while(--i);
+    int i = 1000000000;
 
-    tshPrintLogs();
-
-    LOG_INFO("hello");
+    while(i--);
 
     tshPrintLogs();
 
@@ -21,3 +16,4 @@ int main(int argc, char *argv[]){
 
     return EXIT_SUCCESS;
 }
+
