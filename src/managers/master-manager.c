@@ -6,6 +6,7 @@
 bool tshInit(void){
     tshInitLogManger();
     LOG_INFO("Tanoshi engine startup");
+    get_config();
     tshInitAllocators(0);
 
     return true;

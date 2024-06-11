@@ -24,10 +24,17 @@ if(TARGET_BUILD STREQUAL "debug")
     list(APPEND SOURCE_FILES 
         ${CMAKE_SOURCE_DIR}/src/main.c
     )
+
     add_executable(
         ${PROJECT_NAME}
         ${SOURCE_FILES}
     )
+
+    target_link_libraries(
+        ${PROJECT_NAME}
+        ${YAML_LIB}
+    )
+
 elseif(TARGET_BUILD STREQUAL "test")
     list(APPEND SOURCE_FILES 
         ${CMAKE_SOURCE_DIR}/test/main_test.c
@@ -50,5 +57,6 @@ elseif(TARGET_BUILD STREQUAL "test")
     target_link_libraries(
         "${PROJECT_NAME}_test"
         Tau
+        ${YAML_LIB}
     )
 endif()

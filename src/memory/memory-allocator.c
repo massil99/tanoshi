@@ -1,8 +1,10 @@
 
 #include "../../include/tanoshi/memory-allocator.h"
 #include "../../include/clogger/clogger.h"
+#include "../../include/tanoshi/config.h"
 #include <stdint.h>
-#include <stdio.h>
+
+extern tshConf tsh_config;
 
 uintptr_t tshMasterBuffer;
 
@@ -22,14 +24,16 @@ i32 tshCurrentMemoryOffset = 0;
 bool tshInitAllocators(u32 master_buff_size){
     LOG_INFO("Initializing allocators");
 
-    if(master_buff_size != 0){
+    if(master_buff_size > 0){
         setMasterBufferSize(master_buff_size);
     } else {
-        setMasterBufferSize(TSH_MASTER_BUFFER_DEFAULT_SIZE);
+        kv_data data = tshGetConf(&tsh_config, "MASTER_BUFFER_SIZE");
+        u32 size = (u32)data.integer_value.value;
+        setMasterBufferSize(size);
     }
 
     tshMasterBuffer = (uintptr_t) malloc(tshMasterBufferSize);
-    LOG_INFO("[MEM] Master buffer size = %ld", tshMasterBufferSize);
+    LOG_INFO("Master buffer size = %ld", tshMasterBufferSize);
 
     /***************************STACK ALLOC TEST*************************************/
     tshStackAllocator stAllocator;
@@ -245,7 +249,6 @@ void tshInitLinearAllocator(tshLinearAllocator *allocator, uintptr_t baseAddr, s
     allocator->offset = 0;
 }
 
-
 uintptr_t __tshLinearAllocate(tshLinearAllocator *allocator, size_t size) {
     uintptr_t addr = allocator->baseAddress + allocator->offset;
 
@@ -259,9 +262,6 @@ uintptr_t __tshLinearAllocate(tshLinearAllocator *allocator, size_t size) {
     return addr;
 }
 
-// void tshInitLinearFree(tshLinearAllocator *allocator, size_t size) {
-// }
-
 
 /********************* STACK ALLOCATOR *****************************/
 
@@ -274,7 +274,6 @@ void tshInitStackAllocator(tshStackAllocator *allocator, uintptr_t start, size_t
     allocator->capacity = size;
     allocator->bottomTop = bottomTop;
 }
-
 
 uintptr_t __tshStackAllocate(tshStackAllocator *allocator, size_t size){
     if(allocator->bottomTop){
@@ -319,9 +318,13 @@ void tshStackFree(tshStackAllocator *allocator){
 
 /********************* DOUBLE STACK ALLOCATOR *****************************/
 
-struct __tsh_double_stack_allocator {
-    tshStackAllocator bottomStack;
-    tshStackAllocator topStack;
-};
-
+// typedef struct __tsh_double_stack_allocator {
+//     tshStackAllocator bottomStack;
+//     tshStackAllocator topStack;
+// } tshDoubleStackAllocator;
+//
+// void tshInitDoubleStackAllocator(tshDoubleStackAllocator *allocator, uintptr_t start, size_t size) {
+//     tshInitStackAllocator(&allocator->bottomStack, start, size, true);
+//     tshInitStackAllocator(&allocator->topStack, start + size, size, false);
+// }
 

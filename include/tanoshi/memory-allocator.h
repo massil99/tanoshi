@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 
-#define TSH_MASTER_BUFFER_DEFAULT_SIZE 4096//2000000000
+// #define TSH_MASTER_BUFFER_DEFAULT_SIZE 4096//2000000000
 #define UINTPTR_SIZE sizeof(uintptr_t)
 
 bool tshInitAllocators(u32 master_buff_size);

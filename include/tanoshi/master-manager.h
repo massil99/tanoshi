@@ -5,6 +5,7 @@
 
 #include "log-manager.h"
 #include "memory-allocator.h"
+#include "config.h"
 
 
 bool tshInit(void);

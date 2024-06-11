@@ -127,3 +127,7 @@ TEST(memory, linear_allocator) {
     quit();
 }
 
+
+TEST(memory, dynamic_allocator) {
+
+}
