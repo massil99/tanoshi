@@ -18,6 +18,7 @@ file(GLOB
     SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/managers/*
     ${CMAKE_SOURCE_DIR}/src/memory/*
+    ${CMAKE_SOURCE_DIR}/src/collections/*
 )
 
 if(TARGET_BUILD STREQUAL "debug")

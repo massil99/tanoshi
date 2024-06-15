@@ -7,7 +7,7 @@ bool tshInit(void){
     tshInitLogManger();
     LOG_INFO("Tanoshi engine startup");
     get_config();
-    if (tshInitAllocators(0)){
+    if (!tshInitAllocators(0)){
         return false;
     }
 
@@ -15,7 +15,7 @@ bool tshInit(void){
 }
 
 void tshQuit(void){
-    LOG_INFO("Tanoshi engine shuting down");
+    LOG_INFO("Tanoshi engine shutting down");
     tshQuitAllocators();
     tshQuitLogManger();
     printf("bey...\n");
