@@ -1,16 +1,22 @@
 
 #include "../../include/tanoshi/master-manager.h"
+#include "../../include/tanoshi/config.h"
 #include <stdio.h>
 
+extern tshConf tsh_config;
 
 bool tshInit(void){
     tshInitLogManger();
-    LOG_INFO("Tanoshi engine startup");
+
     get_config();
-    if (tshInitAllocators(0)){
+    kv_data lvl = tshGetConf(&tsh_config, "LOG_LEVEL");
+    tshSetLogLevel(lvl.integer_value.value);
+
+    LOG_INFO("Tanoshi engine startup");
+
+    if (!tshInitAllocators(0)){
         return false;
     }
-
     return true;
 }
 
