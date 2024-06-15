@@ -7,12 +7,21 @@
 extern tshConf tsh_config;
 
 uintptr_t tshMasterBuffer;
-
 u32 tshMasterBufferSize = 0;
-i32 tshPersistentMemoryOffset = 0;
-i32 tshDynamicMemoryOffset = 0;
-i32 tshOneFrameMemoryOffset = 0;
-i32 tshCurrentMemoryOffset = 0;
+
+uintptr_t tshPersistentMemoryOffset = 0;
+u32 tshPersistentMemorySize = 0;
+tshLinearAllocator tshPersistentMemAllocator;
+
+uintptr_t tshDynamicMemoryOffset = 0;
+u32 tshDynamicMemorySize = 0;
+tshDynamicAllocator tshDynamicMemAllocator;
+
+uintptr_t tshOneFrameMemoryOffset = 0;
+u32 tshOneFrameMemorySize = 0;
+
+uintptr_t tshCurrentMemoryOffset = 0;
+tshLinearAllocator tshOneFrameMemAllocator;
 
 
 /*
@@ -22,67 +31,48 @@ i32 tshCurrentMemoryOffset = 0;
  * @return {bool} true if the initializiation went without problems false otherwise
  */
 bool tshInitAllocators(u32 master_buff_size){
-    LOG_INFO("Initializing allocators");
+    kv_data data;
 
+    LOG_INFO("Initializing allocators");
     if(master_buff_size > 0){
         setMasterBufferSize(master_buff_size);
     } else {
-        kv_data data = tshGetConf(&tsh_config, "MASTER_BUFFER_SIZE");
+        data = tshGetConf(&tsh_config, "MASTER_BUFFER_SIZE");
         u32 size = (u32)data.integer_value.value;
         setMasterBufferSize(size);
     }
 
+
     tshMasterBuffer = (uintptr_t) malloc(tshMasterBufferSize);
+    if(tshMasterBuffer == 0){
+        LOG_ERROR("Failed to allocate memmory to master buffer");
+        return false;
+    }
     LOG_INFO("Master buffer size = %ld", tshMasterBufferSize);
 
-    /***************************STACK ALLOC TEST*************************************/
-    tshStackAllocator stAllocator;
-    tshInitStackAllocator(&stAllocator, tshMasterBuffer, 100, true);
+    data = tshGetConf(&tsh_config, "PERSISTENT_MEMORY_SIZE");
+    setPersistentMemorySize(data.integer_value.value);
+    LOG_INFO("Persistent memory size = %ld", tshPersistentMemorySize);
+    tshPersistentMemoryOffset = tshMasterBuffer;
+    tshInitLinearAllocator(&tshPersistentMemAllocator, tshPersistentMemoryOffset,tshPersistentMemorySize);
 
-    u16* addr = tshStackAllocate(&stAllocator, sizeof(u16), u16*);
+    data = tshGetConf(&tsh_config, "DYNAMIC_MEMORY_SIZE");
+    setDynamicMemorySize(data.integer_value.value);
+    LOG_INFO("Dynamic memory size = %ld", tshDynamicMemorySize);
+    tshDynamicMemoryOffset = tshPersistentMemoryOffset + tshPersistentMemorySize;
+    tshInitDynamicAllocator(&tshDynamicMemAllocator, tshDynamicMemoryOffset, tshDynamicMemorySize);
 
-    *addr = 1;
-    LOG_DEBUG("*addr = %d ", *addr);
-    addr = tshStackAllocate(&stAllocator, sizeof(u16)*3, u16*);
-    *addr = 2;
-    addr = tshStackAllocate(&stAllocator, sizeof(u16), u16*);
-    *addr = 3;
-    tshStackFree(&stAllocator);
-    tshStackFree(&stAllocator);
-    addr = tshStackAllocate(&stAllocator, sizeof(u16), u16*);
-    *addr = 4;
-    tshStackFree(&stAllocator); 
-    /****************************************************************/
-    // tshDynamicAllocator dAlloc;  
-    //
-    // tshInitDynamicAllocator(&dAlloc, tshMasterBuffer, 100);
-    //
-    //
-    // i32 *val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
-    // *val = 0xff; 
-    // i32 *todel = tshDynamicAllocate(&dAlloc, sizeof(i32)*4, i32*);
-    // *todel = 0xdd; 
-    // val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
-    // *val = 0xcc; 
-    // tshDynamicFree(&dAlloc, (uintptr_t) todel);
-    // val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
-    // *val = 0xee; 
-    // val = tshDynamicAllocate(&dAlloc, sizeof(i32), i32*);
-    // *val = 0xaa; 
-    // val = tshDynamicAllocate(&dAlloc, sizeof(i32)*2, i32*);
+    data = tshGetConf(&tsh_config, "ONE_FRAME_MEMORY_SIZE");
+    setOneFrameMemorySize(data.integer_value.value);
+    LOG_INFO("One-frame memory size = %ld", tshOneFrameMemorySize);
+    tshOneFrameMemoryOffset = tshDynamicMemoryOffset + tshDynamicMemorySize;
+    tshInitLinearAllocator(&tshOneFrameMemAllocator, tshOneFrameMemoryOffset, tshOneFrameMemorySize);
 
-    /****************************************************************/
-    // tshLinearAllocator li;
-    // u16 lim = 50;
-    //
-    // tshInitLinearAllocator(&li, tshMasterBuffer, 100);
-    // u16* addr = tshLinearAllocate(&li, sizeof(u16)*lim, u16*);
-    // for(u16 i = 0; i < lim; i++){
-    //     addr[i] = i+1;
-    // }
-    // addr = tshLinearAllocate(&li, sizeof(u16), u16*);
-    // addr = tshLinearAllocate(&li, 1, u16*);
-    // LOG_DEBUG("lin add %ld", (uintptr_t)addr);
+    if (tshPersistentMemorySize + tshDynamicMemorySize + tshOneFrameMemorySize > tshMasterBufferSize) {
+        LOG_ERROR("Specialized memory size bigger than master buffer size");
+        return false;
+    }
+    
     return true;
 }
 
@@ -94,6 +84,29 @@ void tshQuitAllocators(void){
     free((void*)tshMasterBuffer);
 }
 
+void setOneFrameMemorySize(u32 BuffSize){
+    tshOneFrameMemorySize = BuffSize;
+}
+
+size_t getOneFrameMemorySize(){
+    return tshOneFrameMemorySize;
+}
+
+void setPersistentMemorySize(u32 BuffSize){
+    tshPersistentMemorySize = BuffSize;
+}
+
+size_t getPersistentMemorySize(){
+    return tshPersistentMemorySize;
+}
+
+void setDynamicMemorySize(u32 BuffSize){
+    tshDynamicMemorySize = BuffSize;
+}
+
+size_t getDynamicMemorySize(){
+    return tshDynamicMemorySize;
+}
 
 /*
  * sets the master buffer size
