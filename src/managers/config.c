@@ -413,7 +413,7 @@ void tshDestroyConfParser(tshConfParser *parser){
     fclose(parser->conf_file);
 }
 
-int get_config(){
+bool get_config(){
     tshConfParser parser;
     tshInitConfParser(&parser, CONFIG_FILE_PATH);
     tshInitConf(&tsh_config);
@@ -425,12 +425,12 @@ int get_config(){
         }
         switch(parser.event.type) {
             case TSH_CONF_STRING_VALUE:
-                LOG_DEBUG("%s = %s", parser.event.property, parser.event.data.propertyString.value);
+                // LOG_DEBUG("%s = %s", parser.event.property, parser.event.data.propertyString.value);
                 tshAddConfig(&tsh_config, parser.event.property, 
                         (kv_data){.object_value.value=parser.event.data.propertyString.value});
                 break;
             case TSH_CONF_INTEGER_VALUE:
-                LOG_DEBUG("%s = %d", parser.event.property, parser.event.data.propertyInteger.value);
+                // LOG_DEBUG("%s = %d", parser.event.property, parser.event.data.propertyInteger.value);
                 tshAddConfig(&tsh_config, parser.event.property, 
                         (kv_data){.integer_value.value=parser.event.data.propertyInteger.value});
                 break;
@@ -445,6 +445,6 @@ int get_config(){
 
     tshDestroyConf(&tsh_config);
     tshDestroyConfParser(&parser);
-    return EXIT_SUCCESS;
+    return true;
 }
 

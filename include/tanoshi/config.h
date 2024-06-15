@@ -86,8 +86,7 @@ typedef struct tsh_conf {
     u32 capacity;
 } tshConf;
 
-int get_config();
-
+bool get_config(void);
 kv_data tshGetConf(tshConf *confList, char name[]);
 
 #endif //_CONFIG_H

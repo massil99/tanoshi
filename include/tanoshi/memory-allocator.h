@@ -11,8 +11,18 @@
 
 bool tshInitAllocators(u32 master_buff_size);
 void tshQuitAllocators(void);
+
 void setMasterBufferSize(u32 buff_size);
 size_t getMasterBufferSize(void);
+
+void setOneFrameMemorySize(u32 BuffSize);
+size_t getOneFrameMemorySize(void);
+
+void setPersistentMemorySize(u32 BuffSize);
+size_t getPersistentMemorySize(void);
+
+void setDynamicMemorySize(u32 BuffSize);
+size_t getDynamicMemorySize(void);
 
 // Dynamic allocator
 #define __TSH_END_DYNAMIC_ADDRESS_TRACKER 0x4D485354
