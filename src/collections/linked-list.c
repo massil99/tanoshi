@@ -3,50 +3,123 @@
 #include <stdlib.h>
 
 /********************* LINKED LIST *********************/
-/**
- * initailizes the linked list with the given value
- * @param {tshLinkedlist*} list the linked list to initalize 
- * @param {tshDataUnion} value first value of the list
- */
-void tshInitLinkedList(tshLinkedlist* list, tshDataUnion value) {
-    list->value = value;
-    list->next = NULL;
+
+tshLinkedList* tshInitLinkedList(void *value) {
+    tshLinkedList* ret = malloc(sizeof(tshLinkedList));
+
+    ret->value = value;
+    ret->next = NULL;
+
+    return ret;
 }
 
-/**
- * adds a value to the linked list 
- * @param {tshLinkedlist*} list ths list to add the value to
- * @param {tshDataUnion} list the value to add to the linked list 
- */ 
-void tshLinedListAdd(tshLinkedlist* list, tshDataUnion value) {
-    tshLinkedlist *curr = list;
+void tshAppendLinkedList(tshLinkedList* list, void *value) {
+    tshLinkedList* tmp = list, *prev = NULL;
 
-    while (curr->next != NULL) {
-        curr = curr->next;
+    while(tmp != NULL) {
+        prev = tmp;
+        tmp = tmp->next;
     }
 
-    curr->next = (tshLinkedlist*)malloc(sizeof(tshLinkedlist));
-    curr->next->value = value;
-    curr->next->next = NULL;
+    if (prev != NULL) {
+        prev->next = tshInitLinkedList(value);
+    }
 }
 
+tshLinkedList* tshPreppendLinkedList(tshLinkedList* list, void *value) {
+    tshLinkedList* tmp = tshInitLinkedList(value);
 
-/**
- * frees all values for the linked list
- * @param {tshLinkedlist*} list the linked lsit to free
- */  
-void tshFreeLinkedList(tshLinkedlist* list) {
-    tshLinkedlist *prev, *curr = list->next;
-    while (curr != NULL) {
-        prev = curr;
-        curr = curr->next;
+    tmp->next = list;
+
+    return tmp;
+}
+
+tshLinkedList* tshInsertLinkedList(tshLinkedList* list, void *value, size_t index) {
+    if (index == 0) {
+        return tshPreppendLinkedList(list, value);     
+    }
+
+    if (list == NULL) {
+        return NULL;
+    }
+
+    tshLinkedList *tmp = list;
+    size_t counter = 0;
+
+    while(tmp->next != NULL && counter < index) {
+        tmp = tmp->next;
+        counter += 1;
+    }
+
+    if (counter == index) {
+        tshLinkedList *d = tshInitLinkedList(value);
+        d->next = tmp->next;
+        tmp->next = d;
+    }
+
+    return list;
+}
+
+void *tshGetLinkedList(tshLinkedList* list, size_t index) {
+    if (list == NULL) {
+        return NULL;
+    }
+
+    if (index == 0) {
+        return list->value; 
+    }
+
+    tshLinkedList *tmp = list;
+    size_t counter = 0;
+
+    while(tmp->next != NULL && counter < index) {
+        tmp = tmp->next; 
+        counter += 1;
+    }
+
+    if (counter == index) {
+        return tmp->value;
+    }
+
+    return NULL;
+}
+
+tshLinkedList*  tshDeleteLinkedList(tshLinkedList* list, size_t index) {
+    tshLinkedList *tmp = list, *prev = NULL;
+    if (list == NULL) {
+        return NULL;
+    }
+
+    if (index == 0) {
+        tmp = list->next;
+        free(list);
+        return tmp; 
+    }
+
+    size_t counter = 0;
+    while(tmp->next != NULL && counter < index) {
+        prev = tmp;
+        tmp = tmp->next;
+        counter += 1;
+    }
+
+    if (counter == index) {
+        prev->next = tmp->next;
+        free(tmp);
+    }
+
+    return list;
+}
+
+void tshFreeLinkedList(tshLinkedList* list) {
+    tshLinkedList *tmp = list, *prev = NULL;
+
+    while(tmp != NULL) {
+        prev = tmp;
+        tmp = tmp->next;
         free(prev);
     }
 }
 
 /******************** STACK *******************************/
-
-void tshInitStack() {
-}
-
 

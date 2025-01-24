@@ -2,22 +2,24 @@
 #define __LINKED_LIST_H
 
 #include "../../include/tanoshi/utils.h"
+#include <stdlib.h>
 
 typedef struct __linked_list {
-    tshDataUnion value;
+    void *value;
     struct __linked_list *next;
-} tshLinkedlist;
+} tshLinkedList;
 
-void tshInitLinkedList(tshLinkedlist* list, tshDataUnion value);
-void tshLinedListAdd(tshLinkedlist* list, tshDataUnion value);
-void tshFreeLinkedList(tshLinkedlist* list);
+tshLinkedList*  tshInitLinkedList(void *value);
+void            tshAppendLinkedList(tshLinkedList* list, void *value);
+tshLinkedList*  tshPreppendLinkedList(tshLinkedList* list, void *value);
+tshLinkedList*  tshInsertLinkedList(tshLinkedList* list, void *value, size_t index);
+void*           tshGetLinkedList(tshLinkedList* list, size_t index);
+tshLinkedList*  tshDeleteLinkedList(tshLinkedList* list, size_t index);
+void            tshFreeLinkedList(tshLinkedList* list);
 
 typedef struct __stack{
     tshDataUnion value; 
     struct __stack *prev;
 }tshStack;
-
-void tshInitStack(){
-}
 
 #endif //__LINKED_LIST_H
