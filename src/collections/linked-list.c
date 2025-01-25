@@ -123,3 +123,22 @@ void tshFreeLinkedList(tshLinkedList* list) {
 
 /******************** STACK *******************************/
 
+tshStack* tshInitStack(void *value) {
+    tshStack* ret = malloc(sizeof(tshStack));
+    ret->value = value;
+    ret->prev = NULL;
+
+    return ret;
+}
+
+tshStack* tshPushStack(tshStack* stack, void *value) {
+    tshStack *tmp = tshInitStack(value);
+    tmp->prev = stack;
+    return tmp;
+}
+
+tshStack* tshPopStack(tshStack* stack, void **value) {
+    *value = stack;
+    return stack->prev;
+}
+

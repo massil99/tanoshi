@@ -18,8 +18,13 @@ tshLinkedList*  tshDeleteLinkedList(tshLinkedList* list, size_t index);
 void            tshFreeLinkedList(tshLinkedList* list);
 
 typedef struct __stack{
-    tshDataUnion value; 
+    void* value; 
     struct __stack *prev;
 }tshStack;
+
+tshStack* tshInitStack(void *value);
+tshStack* tshPushStack(tshStack* stack, void *value);
+tshStack* tshPopStack(tshStack* stack, void **value);
+
 
 #endif //__LINKED_LIST_H
