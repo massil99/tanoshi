@@ -4,6 +4,8 @@ set(PROJECT_NAME "tanoshi")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 message("BUILD TYPE = ${CMAKE_BUILD_TYPE}")
+message("BUILD TYPE = ${TARGET_BUILD}")
+message("BUILD TYPE = ${TEST_TARGET}")
 project(${PROJECT_NAME} C)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -Wall \
@@ -33,12 +35,11 @@ if(TARGET_BUILD STREQUAL "debug")
 
     target_link_libraries(
         ${PROJECT_NAME}
-        ${YAML_LIB}
     )
 
 elseif(TARGET_BUILD STREQUAL "test")
     list(APPEND SOURCE_FILES 
-        ${CMAKE_SOURCE_DIR}/test/main_test.c
+        ${CMAKE_SOURCE_DIR}/test/${TEST_TARGET}.c
     )
 
     include(FetchContent)
@@ -58,6 +59,5 @@ elseif(TARGET_BUILD STREQUAL "test")
     target_link_libraries(
         "${PROJECT_NAME}_test"
         Tau
-        ${YAML_LIB}
     )
 endif()
