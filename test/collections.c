@@ -23,16 +23,43 @@ TAU_MAIN()
 
 #define arr_size 35
 
-// tshLinkedList*  tshInitLinkedList(void *value);
-// void            tshAppendLinkedList(tshLinkedList* list, void *value);
-// tshLinkedList*  tshPreppendLinkedList(tshLinkedList* list, void *value);
-// tshLinkedList*  tshInsertLinkedList(tshLinkedList* list, void *value, unsigned int index);
-// void*           tshGetLinkedList(tshLinkedList* list, unsigned int index);
-// tshLinkedList*  tshRemoveLinkedList(tshLinkedList* list, unsigned int index);
-// void            tshFreeLinkedList(tshLinkedList* list);
-
 TEST(collections, LinkedList) { 
+    init();
+    tshLinkedList *v = NULL;
+
+    struct t arr[arr_size];
+    for (int i = 0; i < arr_size; i++) {
+        arr[i].x = ((float)rand() / RAND_MAX) * 100;
+        arr[i].y = ((float)rand() / RAND_MAX) * 100;
+
+        v = tshAppendLinkedList(v, (void*)&arr[i]);
+        REQUIRE(v != NULL);
+    }
+
+    for (int i = 0; i < arr_size; i++) {
+        struct t *a = (struct t *) tshGetLinkedList(v, i);
+        CHECK_EQ(arr[i].x, a->x);
+        CHECK_EQ(arr[i].y, a->y);
+    }
+
+    struct t tmp = {.x=1.55f, .y=3.14f};
+    v = tshPreppendLinkedList(v, (void*)&tmp);
+
+    struct t *a = (struct t *) tshGetLinkedList(v, 0);
+    REQUIRE(a != NULL);
+    CHECK_EQ(tmp.x, a->x);
+    CHECK_EQ(tmp.y, a->y);
+    v = tshRemoveLinkedList(v, 0);
+    v = tshRemoveLinkedList(v, arr_size - 1);
+
+    v = tshInsertLinkedList(v, &((struct t){.x=1.3f, 3.4f}), 4);
+    struct t *val = (struct t*) tshGetLinkedList(v, 4);
+    REQUIRE(val != NULL);
+    CHECK_EQ(val->x, 1.3f);
+    CHECK_EQ(val->y, 3.4f);
     
+    tshFreeLinkedList(v);
+    quit();
 }
 
 TEST(collections, queue) { 
@@ -95,6 +122,7 @@ TEST(collections, vector) {
     init();
     tshVec v;
     tshInitVec(&v); 
+    REQUIRE(v.$ != NULL);
 
     struct t arr[arr_size];
     for (int i = 0; i < arr_size; i++) {

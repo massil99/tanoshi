@@ -20,8 +20,12 @@ tshLinkedList* tshInitLinkedList(void *value) {
     return ret;
 }
 
-void tshAppendLinkedList(tshLinkedList* list, void *value) {
+tshLinkedList* tshAppendLinkedList(tshLinkedList* list, void *value) {
     tshLinkedList* tmp = list, *prev = NULL;
+    
+    if (list == NULL) {
+        return tshInitLinkedList(value);
+    } 
 
     while(tmp != NULL) {
         prev = tmp;
@@ -31,6 +35,8 @@ void tshAppendLinkedList(tshLinkedList* list, void *value) {
     if (prev != NULL) {
         prev->next = tshInitLinkedList(value);
     }
+
+    return list;
 }
 
 tshLinkedList* tshPreppendLinkedList(tshLinkedList* list, void *value) {

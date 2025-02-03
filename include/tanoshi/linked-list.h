@@ -11,7 +11,7 @@ typedef struct __linked_list {
 } tshLinkedList;
 
 tshLinkedList*  tshInitLinkedList(void *value);
-void            tshAppendLinkedList(tshLinkedList* list, void *value);
+tshLinkedList*  tshAppendLinkedList(tshLinkedList* list, void *value);
 tshLinkedList*  tshPreppendLinkedList(tshLinkedList* list, void *value);
 tshLinkedList*  tshInsertLinkedList(tshLinkedList* list, void *value, unsigned int index);
 void*           tshGetLinkedList(tshLinkedList* list, unsigned int index);
