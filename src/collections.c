@@ -1,6 +1,6 @@
 
-#include "../../include/tanoshi/linked-list.h"
-#include "../../include/clogger/clogger.h"
+#include "../include/tanoshi/collections.h"
+#include "../include/clogger/clogger.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -59,12 +59,12 @@ tshLinkedList* tshInsertLinkedList(tshLinkedList* list, void *value, unsigned in
     tshLinkedList *tmp = list;
     size_t counter = 0;
 
-    while(tmp->next != NULL && counter < index) {
+    while(tmp->next != NULL && counter < index - 1) {
         tmp = tmp->next;
         counter += 1;
     }
 
-    if (counter == index) {
+    if (counter == index - 1) {
         tshLinkedList *d = tshInitLinkedList(value);
         d->next = tmp->next;
         tmp->next = d;
@@ -97,7 +97,7 @@ void *tshGetLinkedList(tshLinkedList* list, unsigned int index) {
     return NULL;
 }
 
-tshLinkedList*  tshRemoveLinkedList(tshLinkedList* list, unsigned int index) {
+tshLinkedList* tshRemoveLinkedList(tshLinkedList* list, unsigned int index) {
     tshLinkedList *tmp = list, *prev = NULL;
     if (list == NULL) {
         return NULL;

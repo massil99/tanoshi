@@ -1,7 +1,7 @@
 #include "tau/tau.h"
 #include "../include/tanoshi/log-manager.h"
 #include "../include/clogger/clogger.h"
-#include "../include/tanoshi/linked-list.h"
+#include "../include/tanoshi/collections.h"
 #include <stdint.h>
 #include <time.h>
 #include <stdbool.h>
@@ -52,11 +52,11 @@ TEST(collections, LinkedList) {
     v = tshRemoveLinkedList(v, 0);
     v = tshRemoveLinkedList(v, arr_size - 1);
 
-    v = tshInsertLinkedList(v, &((struct t){.x=1.3f, 3.4f}), 4);
-    struct t *val = (struct t*) tshGetLinkedList(v, 4);
-    REQUIRE(val != NULL);
-    CHECK_EQ(val->x, 1.3f);
-    CHECK_EQ(val->y, 3.4f);
+    v = tshInsertLinkedList(v, &tmp, 4);
+    a = (struct t*) tshGetLinkedList(v, 4);
+    REQUIRE(a != NULL);
+    CHECK_EQ(tmp.x, a->x);
+    CHECK_EQ(tmp.y, a->y);
     
     tshFreeLinkedList(v);
     quit();

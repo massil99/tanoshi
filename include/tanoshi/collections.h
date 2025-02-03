@@ -1,7 +1,7 @@
-#ifndef __LINKED_LIST_H
-#define __LINKED_LIST_H
+#ifndef __COLLECTIONS_H__
+#define __COLLECTIONS_H__
 
-#include "../../include/tanoshi/utils.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -55,4 +55,4 @@ void tshInsertVec(tshVec *vec, void *value, unsigned int index);
 void tshRemoveVec(tshVec *vec, unsigned int index);
 void tshFreeVec(tshVec vec);
 
-#endif //__LINKED_LIST_H
+#endif //__COLLECTIONS_H__
