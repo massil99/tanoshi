@@ -9,6 +9,7 @@ bool tshInit(void){
     tshInitLogManger();
 
     get_config();
+
     kv_data lvl = tshGetConf(&tsh_config, "LOG_LEVEL");
     tshSetLogLevel(lvl.integer_value.value);
 
@@ -21,7 +22,7 @@ bool tshInit(void){
 }
 
 void tshQuit(void){
-    LOG_INFO("Tanoshi engine shuting down");
+    LOG_INFO("Tanoshi engine shutting down");
     tshQuitAllocators();
     tshQuitLogManger();
     printf("bey...\n");

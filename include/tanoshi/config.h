@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include "../../include/tanoshi/custom_types.h"
+#include "../../include/tanoshi/utils.h"
+
 
 #define CONFIG_FILE_PATH "/home/massil/projects/tanoshi/bin/config"
 
@@ -29,20 +31,7 @@ typedef struct tsh_conf_event_t{
 
     char property[128]; 
     u8 length;
-    union{
-        struct property_float {
-            f32 value;
-        } propertyFloat;
-
-        struct property_integer {
-            i32 value;
-        } propertyInteger;
-
-        struct property_string {
-            char *value; 
-            u8 length;
-        } propertyString;
-    } data;
+    tshDataUnion data;
 }tshConfParserEvent;
 
 typedef struct tsh_conf_parser {
