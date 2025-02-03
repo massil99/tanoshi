@@ -58,7 +58,6 @@ TEST(collections, LinkedList) {
     CHECK_EQ(tmp.x, a->x);
     CHECK_EQ(tmp.y, a->y);
     
-
     tshFreeLinkedList(v);
     quit();
 }
