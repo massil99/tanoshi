@@ -17,6 +17,8 @@ tshLinkedList*  tshInsertLinkedList(tshLinkedList* list, void *value, unsigned i
 void*           tshGetLinkedList(tshLinkedList* list, unsigned int index);
 tshLinkedList*  tshRemoveLinkedList(tshLinkedList* list, unsigned int index);
 void            tshFreeLinkedList(tshLinkedList* list);
+bool            tshLinkedListHasNext(tshLinkedList* list);
+tshLinkedList*  tshLinkedListNext(tshLinkedList* list);
 
 typedef struct __stack{
     void* value; 
@@ -54,5 +56,31 @@ void *tshGetVec(tshVec vec, unsigned int index);
 void tshInsertVec(tshVec *vec, void *value, unsigned int index);
 void tshRemoveVec(tshVec *vec, unsigned int index);
 void tshFreeVec(tshVec vec);
+
+
+enum tshHashTableType {
+    TSH_STR_HASH_TABLE,
+    TSH_U32_HASH_TABLE,
+};
+
+typedef struct __hash_table {
+    struct {
+        union {
+            char* str_key;
+            u32 u32_key;
+        } key;
+        void *value;
+    } *$;
+    size_t size;
+    size_t capacity;
+    tshHashTableType type;
+} tshHashTable;
+
+void tshInitHashTable(tshHashTable *map, tshHashTableType type);
+void tshAddHashTable_str(tshHashTable *map, char* key, void* value);
+void tshAddHashTable_u32(tshHashTable *map, u32 key, void* value);
+void tshAddHashTable_str(tshHashTable *map);
+void tshAddHashTable_u32(tshHashTable *map);
+void tshFreeHasTable(tshHashTable *map);
 
 #endif //__COLLECTIONS_H__

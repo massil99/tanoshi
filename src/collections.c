@@ -134,6 +134,22 @@ void tshFreeLinkedList(tshLinkedList* list) {
     }
 }
 
+bool tshLinkedListHasNext(tshLinkedList* list) {
+    if (list == NULL) {
+        return false;
+    } else {
+        return list->next != NULL;
+    }
+}
+
+tshLinkedList*  tshLinkedListNext(tshLinkedList* list) {
+    if (list == NULL) {
+        return NULL;
+    } else {
+        return list->next;
+    }
+}
+
 /******************** STACK *******************************/
 
 tshStack* tshInitStack(void *value) {
