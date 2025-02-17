@@ -58,29 +58,40 @@ void tshRemoveVec(tshVec *vec, unsigned int index);
 void tshFreeVec(tshVec vec);
 
 
-enum tshHashTableType {
-    TSH_STR_HASH_TABLE,
-    TSH_U32_HASH_TABLE,
-};
+// enum tshHashTableType {
+//     TSH_STR_HASH_TABLE,
+//     TSH_U32_HASH_TABLE,
+// };
+
+#define TSH_HASHTABLE_DEFAULT_SIZE 64
+
+struct __hash_table_elt {
+    char* key;
+    void* value;
+}; 
 
 typedef struct __hash_table {
-    struct {
-        union {
-            char* str_key;
-            u32 u32_key;
-        } key;
-        void *value;
-    } *$;
+    // struct {
+    //     union {
+    //         char* str_key;
+    //         u32 u32_key;
+    //     } key;
+    //     void *value;
+    // } *$;
+    // tshHashTableType type;
+    struct __hash_table_elt *$;
     size_t size;
     size_t capacity;
-    tshHashTableType type;
 } tshHashTable;
 
-void tshInitHashTable(tshHashTable *map, tshHashTableType type);
-void tshAddHashTable_str(tshHashTable *map, char* key, void* value);
-void tshAddHashTable_u32(tshHashTable *map, u32 key, void* value);
-void tshAddHashTable_str(tshHashTable *map);
-void tshAddHashTable_u32(tshHashTable *map);
-void tshFreeHasTable(tshHashTable *map);
+// void tshInitHashTable(tshHashTable *map, tshHashTableType type);
+void tshInitHashTable(tshHashTable *table);
+void tshAddHashTable(tshHashTable *table, char* key, void* value);
+void tshRemoveHashTable(tshHashTable *table, char* key);
+void* tshHashTableGet(tshHashTable *table, char* key);
+bool tshHashTableHasKey(tshHashTable *table, char* key);
+void tshHashTableKeys(tshHashTable *table, tshVec *vec);
+void tshHashTableValues(tshHashTable *table, tshVec *vec);
+void tshFreeHashTable(tshHashTable *table);
 
 #endif //__COLLECTIONS_H__

@@ -1,7 +1,17 @@
 
 #include "../include/tanoshi/custom_types.h"
+#include <stdlib.h>
 
-u32 crc_32(char name[]) {
+/**
+ * Implementation of CRC-32 hash function
+ * @param {string} data string to hash
+ * @returns {i32} the digest(u32) or -1 if error
+ */
+i32 crc_32(char* data) {
+    if (data == NULL) {
+        return -1;
+    }
+
     u32 lookupTable[] = { 
         0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
         0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
@@ -36,11 +46,11 @@ u32 crc_32(char name[]) {
         0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6, 0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf,
         0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d };
 
-    u32 res = 0xFFFFFFFF; 
+    u32 digest = 0xFFFFFFFF; 
 
-    for(u16 i = 0; name[i] != '\0'; i++){
-        u16 lookupIndex = (res ^ name[i]) & 0xff;
-        res = (res >> 8) ^ lookupTable[lookupIndex];
+    for(u16 i = 0; data[i] != '\0'; i++){
+        u16 lookupIndex = (digest ^ data[i]) & 0xff;
+        digest = (digest >> 8) ^ lookupTable[lookupIndex];
     }
-    return res ^ 0xFFFFFFFF;
+    return digest ^ 0xFFFFFFFF;
 }

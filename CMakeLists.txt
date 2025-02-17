@@ -21,6 +21,7 @@ file(GLOB
     ${CMAKE_SOURCE_DIR}/src/managers/*
     ${CMAKE_SOURCE_DIR}/src/memory/*
     ${CMAKE_SOURCE_DIR}/src/collections.c
+    ${CMAKE_SOURCE_DIR}/src/hash.c
 )
 
 if(TARGET_BUILD STREQUAL "debug")

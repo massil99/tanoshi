@@ -154,3 +154,47 @@ TEST(collections, vector) {
     tshFreeVec(v);
     quit();
 }
+
+// void tshInitHashTable(tshHashTable *table);
+// void tshAddHashTable(tshHashTable *table, char* key, void* value);
+// void tshRemoveashTable(tshHashTable *table, char* key);
+// void tshFreeHasTable(tshHashTable *table);
+TEST(collections, Hahstables)  {
+    init();
+    tshHashTable table;
+    tshInitHashTable(&table);
+    struct t stuff[arr_size];
+    for (int i = 0; i < arr_size; i++) {
+        stuff[i].x = ((float)rand() / RAND_MAX) * 100;
+        stuff[i].y = ((float)rand() / RAND_MAX) * 100;
+        char key[20];
+        sprintf(key, "key-%d", i);
+        tshAddHashTable(&table, key, (void*) &stuff[i]);
+    }
+
+    for (int i = 0; i < arr_size; i++) {
+        char key[20];
+        sprintf(key, "key-%d", i);
+        struct t *val = tshHashTableGet(&table, key);
+        REQUIRE(val != NULL);
+        CHECK(tshHashTableHasKey(&table, key));
+        CHECK_EQ(val->x, stuff[i].x);
+        CHECK_EQ(val->y, stuff[i].y);
+    }
+
+    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    tshRemoveHashTable(&table, "key-3");
+    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    tshRemoveHashTable(&table, "key-22");
+    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    tshRemoveHashTable(&table, "key-5");
+    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    tshRemoveHashTable(&table, "key-16");
+    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    tshRemoveHashTable(&table, "key-9");
+    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    tshFreeHashTable(&table);
+
+    quit();
+}
+
