@@ -485,7 +485,6 @@ void tshHashTableValues(tshHashTable *table, tshVec *vec) {
 }
 
 void tshFreeHashTable(tshHashTable *table) {
-
     for (size_t i = 0; i < table->capacity; i++) {
         if (table->$[i].key != NULL) {
             free(table->$[i].key);
