@@ -2,11 +2,11 @@
 #define _CONFIG_H
 
 #include <stdio.h>
-#include "../../include/tanoshi/custom_types.h"
-#include "../../include/tanoshi/utils.h"
+#include "custom_types.h"
+#include "utils.h"
 
 
-#define CONFIG_FILE_PATH "/home/massil/projects/tanoshi/bin/config"
+#define CONFIG_FILE_PATH "/home/massil/projects/tanoshi/build/bin/config"
 
 typedef enum {
     TSH_CONF_NOEVENT                 ,

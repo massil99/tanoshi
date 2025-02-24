@@ -6,12 +6,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <assert.h>
 
-#include "../../include/tanoshi/config.h"
-#include "../../include/clogger/clogger.h"
-#include "../../include/tanoshi/custom_types.h"
-#include "../../include/tanoshi/hash.h"
-#include "../../include/tanoshi/utils.h"
+#include "config.h"
+#include "clogger.h"
+#include "custom_types.h"
+#include "hash.h"
+#include "utils.h"
 
 tshConf tsh_config;
 
@@ -142,10 +143,12 @@ void print_state(tshConfigParserState state){
 }
 
 void tshInitConfParser(tshConfParser *parser, char *filepath){
+    LOG_INFO("Configuration file found at (%s)", filepath);
     parser->conf_file = fopen(filepath, "r");
     parser->event.type = TSH_CONF_NOEVENT;
     if (parser->conf_file == NULL){
-        LOG_ERROR("Configuration file not found at (%s)", CONFIG_FILE_PATH);
+        LOG_ERROR("Configuration file not found at (%s)", filepath);
+        assert(false);
     } 
 }
 
@@ -368,9 +371,14 @@ void tshDestroyConfParser(tshConfParser *parser){
     fclose(parser->conf_file);
 }
 
+#define STRING(x) #x
+#define XSTRING(x) STRING(x)
+
 bool get_config(){
     tshConfParser parser;
-    tshInitConfParser(&parser, CONFIG_FILE_PATH);
+    char path[240] = "";
+    sprintf(path, "%s/config", XSTRING(ROOT_DIR));
+    tshInitConfParser(&parser, path);
     tshInitConf(&tsh_config);
 
     do{

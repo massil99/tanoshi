@@ -1,6 +1,6 @@
 
 #define CLOGGER_IMPLEMENTATION
-#include "../../include/clogger/clogger.h"
+#include "clogger.h"
 #include <stdbool.h>
 
 

@@ -1,7 +1,7 @@
 
-#include "../include/tanoshi/collections.h"
-#include "../include/tanoshi/hash.h"
-#include "../include/clogger/clogger.h"
+#include "collections.h"
+#include "hash.h"
+#include "clogger.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,7 +1,7 @@
 #include "tau/tau.h"
-#include "../include/tanoshi/log-manager.h"
-#include "../include/clogger/clogger.h"
-#include "../include/tanoshi/collections.h"
+#include "log-manager.h"
+#include "clogger.h"
+#include "collections.h"
 #include <stdint.h>
 #include <time.h>
 #include <stdbool.h>

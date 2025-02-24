@@ -1,7 +1,7 @@
 
-#include "../../include/tanoshi/memory-allocator.h"
-#include "../../include/clogger/clogger.h"
-#include "../../include/tanoshi/config.h"
+#include "memory-allocator.h"
+#include "clogger.h"
+#include "config.h"
 #include <stdint.h>
 
 extern tshConf tsh_config;

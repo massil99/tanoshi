@@ -1,6 +1,6 @@
 
-#include "../../include/tanoshi/master-manager.h"
-#include "../../include/tanoshi/config.h"
+#include "master-manager.h"
+#include "config.h"
 #include <stdio.h>
 
 extern tshConf tsh_config;

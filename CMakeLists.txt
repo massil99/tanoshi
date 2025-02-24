@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_NAME "tanoshi")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
 
 message("BUILD TYPE = ${TARGET_BUILD}")
 message("BUILD TYPE = ${TEST_TARGET}")
@@ -26,6 +26,8 @@ file(GLOB
     ${CMAKE_SOURCE_DIR}/src/hash.c
 )
 
+add_subdirectory(lib)
+
 if(TARGET_BUILD STREQUAL "debug")
     list(APPEND SOURCE_FILES 
         ${CMAKE_SOURCE_DIR}/src/main.c
@@ -40,6 +42,13 @@ if(TARGET_BUILD STREQUAL "debug")
         ${PROJECT_NAME}
     )
 
+    target_include_directories(${PROJECT_NAME} PUBLIC
+        "${CMAKE_SOURCE_DIR}/include"
+    )
+
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
+        "ROOT_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+    )
 elseif(TARGET_BUILD STREQUAL "test")
     list(APPEND SOURCE_FILES 
         ${CMAKE_SOURCE_DIR}/test/${TEST_TARGET}.c
@@ -63,4 +72,13 @@ elseif(TARGET_BUILD STREQUAL "test")
         "${PROJECT_NAME}_test"
         Tau
     )
+
+    target_compile_definitions("${PROJECT_NAME}_test" PUBLIC
+        "ROOT_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+    )
+
+    target_include_directories("${PROJECT_NAME}_test" PUBLIC
+        "${CMAKE_SOURCE_DIR}/include"
+    )
 endif()
+

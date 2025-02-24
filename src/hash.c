@@ -1,5 +1,5 @@
 
-#include "../include/tanoshi/custom_types.h"
+#include "custom_types.h"
 #include <stdlib.h>
 
 /**

@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
 
-#include "../include/tanoshi/master-manager.h"
+#include "master-manager.h"
 
 int main(int argc, char *argv[]){
     int exit_code = EXIT_SUCCESS;
