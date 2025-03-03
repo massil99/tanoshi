@@ -1,16 +1,15 @@
 
 #include "custom_types.h"
 #include <stdlib.h>
+#include <assert.h>
 
 /**
  * Implementation of CRC-32 hash function
  * @param {string} data string to hash
  * @returns {i32} the digest(u32) or -1 if error
  */
-i32 crc_32(char* data) {
-    if (data == NULL) {
-        return -1;
-    }
+u32 crc_32(char* data) {
+    assert(data != NULL);
 
     u32 lookupTable[] = { 
         0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,

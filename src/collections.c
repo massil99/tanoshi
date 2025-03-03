@@ -264,20 +264,20 @@ void tshFreeQueue(tshQueue* queue) {
 
 void __expandVec(tshVec *vec) {
     vec->capacity *= 2;
-    vec->$ = realloc(vec->$, vec->capacity * sizeof(void*));
+    vec->_$$_ = realloc(vec->_$$_, vec->capacity * sizeof(void*));
 }
 
 void __shrinkVec(tshVec *vec) {
     if (vec->capacity / 2 > 0) {
         vec->capacity /= 2;
-        vec->$ = realloc(vec->$, vec->capacity * sizeof(void*));
+        vec->_$$_ = realloc(vec->_$$_, vec->capacity * sizeof(void*));
     }
 }
 
 void tshInitVec(tshVec* vec) {
     vec->capacity = __TSH_VEC_DEFAULT_SIZE;
     vec->size = 0;
-    vec->$ = malloc(sizeof(void*) * __TSH_VEC_DEFAULT_SIZE);
+    vec->_$$_ = malloc(sizeof(void*) * __TSH_VEC_DEFAULT_SIZE);
 }
 
 void tshAppendVec(tshVec *vec, void* value) {
@@ -285,7 +285,7 @@ void tshAppendVec(tshVec *vec, void* value) {
         __expandVec(vec);
     }
     
-    vec->$[vec->size++] = value;
+    vec->_$$_[vec->size++] = value;
 }
 
 void tshPreppendVec(tshVec *vec, void* value) {
@@ -296,7 +296,7 @@ void* tshGetVec(tshVec vec, unsigned int index) {
     if (vec.size <= index) {
         return NULL;
     }
-    return vec.$[index];
+    return vec._$$_[index];
 }
 
 void tshInsertVec(tshVec *vec, void *value, unsigned int index) {
@@ -307,20 +307,20 @@ void tshInsertVec(tshVec *vec, void *value, unsigned int index) {
             __expandVec(vec);
         }
         for (size_t i = vec->size; i > index; i--) {
-            vec->$[i - 1] = vec->$[i];
+            vec->_$$_[i - 1] = vec->_$$_[i];
         }
         vec->size += 1;
-        vec->$[index] = value;
+        vec->_$$_[index] = value;
     }
 }
 
 void tshRemoveVec(tshVec *vec, unsigned int index) {
     for (size_t i = index; i < vec->size - 1; i++) {
-        vec->$[i] = vec->$[i + 1];
+        vec->_$$_[i] = vec->_$$_[i + 1];
     }
 
     if (index < vec->size) {
-        vec->$[--vec->size] = NULL;
+        vec->_$$_[--vec->size] = NULL;
     }
 
     if (vec->size < (vec->capacity / 2)) {
@@ -329,31 +329,69 @@ void tshRemoveVec(tshVec *vec, unsigned int index) {
 }
 
 void tshFreeVec(tshVec vec) {
-    free(vec.$);
+    free(vec._$$_);
 }
 
 /******************** HashTable *******************************/
 
 void tshInitHashTable(tshHashTable *table) {
-    table->$ = calloc(TSH_HASHTABLE_DEFAULT_SIZE, sizeof(struct __hash_table_elt));
+    table->_$$_ = calloc(TSH_HASHTABLE_DEFAULT_SIZE, sizeof(struct __hash_table_elt));
     table->size = 0;
     table->capacity = TSH_HASHTABLE_DEFAULT_SIZE;
 }
 
-void __insert(struct __hash_table_elt *table, size_t index, char *key, void* value) {
+void __insert(struct __hash_table_elt *table, size_t index, char *key, void* value, size_t prob_dist) {
     table[index].key = strdup(key); 
     table[index].value = value; 
+    table[index].prob_distance = prob_dist; 
 }
 
 void __add_entry(struct __hash_table_elt *table, char* key, void* value, size_t capacity) {
-    i32 h = crc_32(key) % capacity;
+    u32 h = crc_32(key) % capacity;
+    size_t prob_dist = 0;
+
     if (table[h].key == NULL) {
-        __insert(table, h, key, value);
+        __insert(table, h, key, value, prob_dist);
     } else {
-        LOG_WARN("There is a collision at %d", h);
         size_t i = (h + 1) % capacity;
-        while (table[i].key != NULL && i != h) i = (i + 1) % capacity; 
-        __insert(table, i, key, value);
+        prob_dist += 1;
+
+        while (
+            table[i].key != NULL && 
+            strcmp(table[i].key, key) != 0 &&
+            table[i].prob_distance != 0 && 
+            i != h
+        ) { 
+            i = (i + 1) % capacity; 
+            prob_dist += 1;
+        } 
+
+        if (table[i].key == NULL || strcmp(table[i].key, key) == 0) {
+            if (table[i].key != NULL) free(table[i].key);
+            __insert(table, i, key, value, prob_dist);
+        } else if (table[i].prob_distance == 0) {
+            struct __hash_table_elt to_insert;
+            to_insert.key = strdup(key);
+            to_insert.value = value;
+            to_insert.prob_distance = prob_dist;
+            struct __hash_table_elt to_move;
+
+            while (table[i].key != NULL) {
+                to_move.key = table[i].key;
+                to_move.value = table[i].value;
+                to_move.prob_distance = table[i].prob_distance;
+                __insert(table, i, to_insert.key, to_insert.value, to_insert.prob_distance);
+                free(to_insert.key);
+                to_insert.key = to_move.key;
+                to_insert.value = to_move.value;
+                to_insert.prob_distance = to_move.prob_distance + 1;
+                i = (i + 1) % capacity;
+            }
+            __insert(table, i, to_insert.key, to_insert.value, to_insert.prob_distance);
+            free(to_insert.key);
+        } else {
+            LOG_ERROR("Unreachable code: Hashtable is full");
+        }
     }
 }
 
@@ -361,14 +399,14 @@ void __null_realocate(tshHashTable *table, size_t new_capacity) {
     struct __hash_table_elt *tmp = calloc(new_capacity, sizeof(struct __hash_table_elt));
     
     for(size_t i = 0; i < table->capacity; i++) {
-        if (table->$[i].key != NULL) {
-            __add_entry(tmp, table->$[i].key, table->$[i].value, new_capacity);
-            free(table->$[i].key);
+        if (table->_$$_[i].key != NULL) {
+            __add_entry(tmp, table->_$$_[i].key, table->_$$_[i].value, new_capacity);
+            free(table->_$$_[i].key);
         }
     }
     
-    free(table->$);
-    table->$ = tmp;
+    free(table->_$$_);
+    table->_$$_ = tmp;
     table->capacity = new_capacity;
 }
 
@@ -379,11 +417,11 @@ void __expandHT(tshHashTable *table) {
 void tshAddHashTable(tshHashTable *table, char* key, void* value) {
     assert (table != NULL && key != NULL);
 
-    if (table->size >= (table->capacity / 2)) {
+    if (table->size == table->capacity) {
         __expandHT(table);
     }
 
-    __add_entry(table->$, key, value, table->capacity);
+    __add_entry(table->_$$_, key, value, table->capacity);
     table->size += 1;
 }
 
@@ -397,19 +435,43 @@ void __remove(struct __hash_table_elt* table, size_t index) {
     free(table[index].key);
     table[index].key = NULL;
     table[index].value = NULL;
+    table[index].prob_distance = 0;
+}
+
+void __shift_back(struct __hash_table_elt* table, size_t index, size_t capacity) {
+    size_t i = index;
+    size_t j = (i + 1) % capacity;
+
+    while (table[j].key != NULL && table[j].prob_distance != 0) {
+        __insert(table, i, table[j].key, table[j].value, table[j].prob_distance - 1);
+        __remove(table, j);
+        i = j;
+        j = (j + 1) % capacity;
+    }
+    __remove(table, i);
 }
 
 void __remove_entry(struct __hash_table_elt* table, char* key, size_t capacity) {
-    i32 h = crc_32(key) % capacity;
+    u32 h = crc_32(key) % capacity;
 
     if (table[h].key != NULL && strcmp(key, table[h].key) == 0) {
         __remove(table, h);
+        __shift_back(table, h, capacity);
     } else {
         u32 i = (h + 1) % capacity;
-        while ((table[i].key == NULL || strcmp(table[i].key, key) != 0) && h != i) i = (i + 1) % capacity;
+        // Factor fetching index of element
+        while (
+            table[i].key != NULL && 
+            strcmp(table[i].key, key) != 0 &&
+            table[i].prob_distance != 0 && 
+            i != h
+        ) {
+            i = (i + 1) % capacity;
+        }
 
-        if (h != i) {
+        if (strcmp(table[i].key, key) == 0) {
             __remove(table, i);
+            __shift_back(table, i, capacity);
         } else { 
             LOG_WARN("key (%s) does not exist in table", key);
         }
@@ -419,7 +481,7 @@ void __remove_entry(struct __hash_table_elt* table, char* key, size_t capacity) 
 void tshRemoveHashTable(tshHashTable *table, char* key) {
     assert(table != NULL && key != NULL && table->size > 0);
 
-    __remove_entry(table->$, key, table->capacity);
+    __remove_entry(table->_$$_, key, table->capacity);
     table->size -= 1;
 
     if (table->size <= (table->capacity / 4)) {
@@ -432,16 +494,25 @@ void* tshHashTableGet(tshHashTable *table, char* key) {
         return NULL;
     }
 
-    i32 h = crc_32(key) % table->capacity;
-    if (table->$[h].key != NULL && strcmp(table->$[h].key, key) == 0) {
-        return table->$[h].value;
+    u32 h = crc_32(key) % table->capacity;
+    if (table->_$$_[h].key != NULL && strcmp(table->_$$_[h].key, key) == 0) {
+        return table->_$$_[h].value;
     } else {
         u32 i = (h + 1) % table->capacity;
-        while ((table->$[i].key == NULL || strcmp(table->$[i].key, key) != 0) && i != h) i = (i + 1) % table-> capacity;
+        while (
+            table->_$$_[i].key != NULL &&
+            table->_$$_[i].prob_distance != 0 &&
+            strcmp(table->_$$_[i].key, key) != 0 &&
+            i != h
+        ) {
+            i = (i + 1) % table->capacity;
+        }
         
-        if (i == h) return NULL;
+        if (i == h || table->_$$_[i].key == NULL || table->_$$_[i].prob_distance == 0) {
+            return NULL;
+        }
 
-        return table->$[i].value;
+        return table->_$$_[i].value;
     }
 }
 
@@ -450,46 +521,62 @@ bool tshHashTableHasKey(tshHashTable *table, char* key) {
         return NULL;
     }
 
-    i32 h = crc_32(key) % table->capacity;
-    if (table->$[h].key != NULL && strcmp(table->$[h].key, key) == 0) {
+    u32 h = crc_32(key) % table->capacity;
+    if (table->_$$_[h].key != NULL && strcmp(table->_$$_[h].key, key) == 0) {
         return true;
     } else {
         u32 i = (h + 1) % table->capacity;
-        while ((table->$[i].key == NULL || strcmp(table->$[i].key, key) != 0) && i != h) i = (i + 1) % table-> capacity;
+        while (
+            table->_$$_[i].key != NULL &&
+            table->_$$_[i].prob_distance != 0 &&
+            strcmp(table->_$$_[i].key, key) != 0 && 
+            i != h
+        ) { 
+            i = (i + 1) % table-> capacity; 
+        }
         
-        if (i == h) return false;
+        if (i == h || table->_$$_[i].key == NULL || table->_$$_[i].prob_distance == 0) return false;
 
         return true;
     }
 }
 
+// depricated for the time being 
 void tshHashTableKeys(tshHashTable *table, tshVec *vec) {
     assert(table != NULL && vec != NULL);
 
     tshInitVec(vec);
     for (size_t i = 0; i < table->capacity; i++) {
-        if (table->$[i].key != NULL) {
+        if (table->_$$_[i].key != NULL) {
             // is it wise to not duplicate the key ??? time will tell us
-            tshAppendVec(vec, (void*)table->$[i].key);
+            tshAppendVec(vec, (void*)table->_$$_[i].key);
         }
     }
 }
 
+// depricated for the time being 
 void tshHashTableValues(tshHashTable *table, tshVec *vec) {
     tshInitVec(vec);
     for (size_t i = 0; i < table->capacity; i++) {
-        if (table->$[i].key != NULL) {
-            tshAppendVec(vec, table->$[i].value);
+        if (table->_$$_[i].key != NULL) {
+            tshAppendVec(vec, table->_$$_[i].value);
         }
+    }
+}
+
+
+void tshPrintHashTable(tshHashTable table) {
+    for (size_t i = 0; i < table.capacity; i +=1) {
+        LOG_INFO("HT[%d] = {key: '%s', value: %p, prob_distance: %d}",i,  table._$$_[i].key, table._$$_[i].value, table._$$_[i].prob_distance);
     }
 }
 
 void tshFreeHashTable(tshHashTable *table) {
     for (size_t i = 0; i < table->capacity; i++) {
-        if (table->$[i].key != NULL) {
-            free(table->$[i].key);
+        if (table->_$$_[i].key != NULL) {
+            free(table->_$$_[i].key);
         }
     }
-    free(table->$);
+    free(table->_$$_);
 }
 

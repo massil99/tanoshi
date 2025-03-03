@@ -21,7 +21,7 @@ struct t {
 
 TAU_MAIN()
 
-#define arr_size 35
+#define arr_size 15000
 
 TEST(collections, LinkedList) { 
     init();
@@ -123,7 +123,7 @@ TEST(collections, vector) {
     init();
     tshVec v;
     tshInitVec(&v); 
-    REQUIRE(v.$ != NULL);
+    REQUIRE(v._$$_ != NULL);
 
     struct t arr[arr_size];
     for (int i = 0; i < arr_size; i++) {
@@ -133,11 +133,11 @@ TEST(collections, vector) {
         tshAppendVec(&v, (void*)&arr[i]);
     }
 
-    CHECK_EQ(v.capacity, 64);
+    CHECK_EQ(v.capacity, 16384);
     CHECK_EQ(v.size, arr_size);
 
     for (int i = 0; i < arr_size; i++) {
-        struct t *a = (struct t *)v.$[i];
+        struct t *a = (struct t *)v._$$_[i];
         CHECK_EQ(arr[i].x, a->x);
         CHECK_EQ(arr[i].y, a->y);
     }
@@ -182,17 +182,18 @@ TEST(collections, Hahstables)  {
         CHECK_EQ(val->y, stuff[i].y);
     }
 
-    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
     tshRemoveHashTable(&table, "key-3");
-    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    CHECK(tshHashTableHasKey(&table, "key-3") == false);
     tshRemoveHashTable(&table, "key-22");
-    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    CHECK(tshHashTableHasKey(&table, "key-22") == false);
     tshRemoveHashTable(&table, "key-5");
-    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    CHECK(tshHashTableHasKey(&table, "key-5") == false);
     tshRemoveHashTable(&table, "key-16");
-    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    CHECK(tshHashTableHasKey(&table, "key-16") == false);
     tshRemoveHashTable(&table, "key-9");
-    LOG_DEBUG("Table size %ld, Table capacity %ld", table.size, table.capacity);
+    CHECK(tshHashTableHasKey(&table, "key-9") == false);
+
+
     tshFreeHashTable(&table);
 
     quit();

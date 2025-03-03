@@ -45,7 +45,7 @@ void tshFreeQueue(tshQueue* queue);
 typedef struct __vec {
     size_t capacity;
     size_t size;
-    void **$;
+    void **_$$_;
 } tshVec;
 #define __TSH_VEC_DEFAULT_SIZE 32
 
@@ -68,6 +68,7 @@ void tshFreeVec(tshVec vec);
 struct __hash_table_elt {
     char* key;
     void* value;
+    size_t prob_distance;
 }; 
 
 typedef struct __hash_table {
@@ -79,7 +80,7 @@ typedef struct __hash_table {
     //     void *value;
     // } *$;
     // tshHashTableType type;
-    struct __hash_table_elt *$;
+    struct __hash_table_elt *_$$_;
     size_t size;
     size_t capacity;
 } tshHashTable;
@@ -93,5 +94,6 @@ bool tshHashTableHasKey(tshHashTable *table, char* key);
 void tshHashTableKeys(tshHashTable *table, tshVec *vec);
 void tshHashTableValues(tshHashTable *table, tshVec *vec);
 void tshFreeHashTable(tshHashTable *table);
+void tshPrintHashTable(tshHashTable table);
 
 #endif //__COLLECTIONS_H__
