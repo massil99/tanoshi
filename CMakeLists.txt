@@ -10,6 +10,7 @@ message("BUILD TYPE = ${TEST_TARGET}")
 project(${PROJECT_NAME} C)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
+    -lm \
     -Wall \
     -Werror \
 ")
@@ -24,6 +25,7 @@ file(GLOB
     ${CMAKE_SOURCE_DIR}/src/memory/*
     ${CMAKE_SOURCE_DIR}/src/collections.c
     ${CMAKE_SOURCE_DIR}/src/hash.c
+    ${CMAKE_SOURCE_DIR}/src/tshStrings.c
 )
 
 add_subdirectory(lib)
