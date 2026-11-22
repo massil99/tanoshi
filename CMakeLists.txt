@@ -1,86 +1,46 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 4.2)
+project(Tanoshi 
+    VERSION 1.0
+    LANGUAGES C CXX
+)
 
-set(PROJECT_NAME "tanoshi")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-message("BUILD TYPE = ${TARGET_BUILD}")
-message("BUILD TYPE = ${TEST_TARGET}")
-project(${PROJECT_NAME} C)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY, ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_EXPORT_COMPILE_COMMANDS, "ON")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
     -lm \
     -Wall \
     -Werror \
+    -g \
 ")
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} \
-    -g\
-")
+add_subdirectory(libs/collections)
+add_subdirectory(libs/memory)
+add_subdirectory(libs/managers)
+add_subdirectory(libs/hashing)
+add_subdirectory(test)
 
-file(GLOB
-    SOURCE_FILES
-    ${CMAKE_SOURCE_DIR}/src/managers/*
-    ${CMAKE_SOURCE_DIR}/src/memory/*
-    ${CMAKE_SOURCE_DIR}/src/collections.c
-    ${CMAKE_SOURCE_DIR}/src/hash.c
-    ${CMAKE_SOURCE_DIR}/src/tshStrings.c
+add_executable(Tanoshi apps/cli/src/main.c)
+
+target_link_libraries(Tanoshi
+    PRIVATE
+        collections
+        memory
+        managers
+        hashing
 )
 
-add_subdirectory(lib)
-
-if(TARGET_BUILD STREQUAL "debug")
-    list(APPEND SOURCE_FILES 
-        ${CMAKE_SOURCE_DIR}/src/main.c
-    )
-
-    add_executable(
-        ${PROJECT_NAME}
-        ${SOURCE_FILES}
-    )
-
-    target_link_libraries(
-        ${PROJECT_NAME}
-    )
-
-    target_include_directories(${PROJECT_NAME} PUBLIC
-        "${CMAKE_SOURCE_DIR}/include"
-    )
-
-    target_compile_definitions(${PROJECT_NAME} PUBLIC
-        "ROOT_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
-    )
-elseif(TARGET_BUILD STREQUAL "test")
-    list(APPEND SOURCE_FILES 
-        ${CMAKE_SOURCE_DIR}/test/${TEST_TARGET}.c
-    )
-
-    include(FetchContent)
-    FetchContent_Declare(
-        Tau
-        URL https://github.com/jasmcaus/tau/archive/dev.zip
-    )
-    
-    FetchContent_MakeAvailable(Tau)
-    enable_testing()
-
-    add_executable(
-        "${PROJECT_NAME}_test"
-        ${SOURCE_FILES}
-    )
-    
-    target_link_libraries(
-        "${PROJECT_NAME}_test"
-        Tau
-    )
-
-    target_compile_definitions("${PROJECT_NAME}_test" PUBLIC
-        "ROOT_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
-    )
-
-    target_include_directories("${PROJECT_NAME}_test" PUBLIC
-        "${CMAKE_SOURCE_DIR}/include"
-    )
-endif()
+target_include_directories(Tanoshi
+    PRIVATE
+        ./include/
+        libs/collections/include
+        libs/memory/include
+        libs/managers/include
+        libs/hashing/include
+        external/clogger
+)
 

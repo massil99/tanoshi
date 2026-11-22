@@ -1,6 +1,6 @@
 
-#include "memory-allocator.h"
 #include "clogger.h"
+#include "memory-allocator.h"
 #include "config.h"
 #include <stdint.h>
 
@@ -142,7 +142,7 @@ uintptr_t __dynamicAllocate(tshDynamicAllocator *allocator, size_t size) {
         // so we allocate the base addresse
         addr = allocator->baseAddress;
     } else { 
-        // if memory was already allocated we look for the last addresse in the tracker
+        // if memory was already allocated we look for the last address in the tracker
         while(*((u32*)tmp) != __TSH_END_DYNAMIC_ADDRESS_TRACKER){
             tmp -= sizeof(__tshDynamicTracker);
         }

@@ -6,7 +6,7 @@
 #include "utils.h"
 
 
-#define CONFIG_FILE_PATH "/home/massil/projects/tanoshi/build/bin/config"
+#define CONFIG_FILE_PATH "/home/massil/projects/tanoshi/config"
 
 typedef enum {
     TSH_CONF_NOEVENT                 ,

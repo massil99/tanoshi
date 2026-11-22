@@ -77,7 +77,7 @@ kv_data tshGetConf(tshConf *confList, char name[]){
     u32 hash = crc_32(name) % confList->capacity; 
     
     for (u32 i = hash; i + 1 != hash; i = (i + 1) % confList->capacity) {
-        if(confList->enteries[i].key != NULL){
+        if(confList->enteries[i].occupied == true){
             u32 condidat = crc_32(confList->enteries[i].key) % confList->capacity;
 
             if(hash == condidat &&
@@ -377,7 +377,8 @@ void tshDestroyConfParser(tshConfParser *parser){
 bool get_config(){
     tshConfParser parser;
     char path[240] = "";
-    sprintf(path, "%s/config", XSTRING(ROOT_DIR));
+    // sprintf(path, "%s/config", XSTRING(ROOT_DIR));
+    sprintf(path, "%s", CONFIG_FILE_PATH);
     tshInitConfParser(&parser, path);
     tshInitConf(&tsh_config);
 
