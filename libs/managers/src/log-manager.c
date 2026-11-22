@@ -1,8 +1,9 @@
 
+#include <stdbool.h>
+#include <stdlib.h>
+
 #define CLOGGER_IMPLEMENTATION
 #include "clogger.h"
-#include <stdbool.h>
-
 
 void tshInitLogManger(){
     clogger_init(NULL, true, 0);

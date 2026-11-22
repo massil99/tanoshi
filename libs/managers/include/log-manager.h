@@ -2,6 +2,7 @@
 #define _LOG_MANAGER_H_
 
 #include "clogger.h"
+
 void tshInitLogManger();
 void tshPrintLogs();
 void tshSetLogLevel(cloggerLVL lvl);

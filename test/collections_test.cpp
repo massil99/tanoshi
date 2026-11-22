@@ -1,16 +1,20 @@
-#include "tau/tau.h"
+
+#include <gtest/gtest.h>
+extern "C" {
 #include "log-manager.h"
 #include "clogger.h"
 #include "collections.h"
 #include <stdint.h>
 #include <time.h>
 #include <stdbool.h>
+}
 
-void init(){
+void colls_init(){
     srand(time(NULL));
     tshInitLogManger();
 }
-void quit(){
+
+void colls_quit(){
     tshQuitLogManger();
 }
 
@@ -19,12 +23,10 @@ struct t {
     float y;
 };
 
-TAU_MAIN()
-
 #define arr_size 15000
 
 TEST(collections, LinkedList) { 
-    init();
+    colls_init();
     tshLinkedList *v = NULL;
 
     struct t arr[arr_size];
@@ -33,38 +35,38 @@ TEST(collections, LinkedList) {
         arr[i].y = ((float)rand() / RAND_MAX) * 100;
 
         v = tshAppendLinkedList(v, (void*)&arr[i]);
-        REQUIRE(v != NULL);
+        ASSERT_TRUE(v != NULL);
     }
 
     for (int i = 0; i < arr_size; i++) {
         struct t *a = (struct t *) tshGetLinkedList(v, i);
-        CHECK_EQ(arr[i].x, a->x);
-        CHECK_EQ(arr[i].y, a->y);
+        EXPECT_EQ(arr[i].x, a->x);
+        EXPECT_EQ(arr[i].y, a->y);
     }
 
     struct t tmp = {.x=1.55f, .y=3.14f};
     v = tshPreppendLinkedList(v, (void*)&tmp);
 
     struct t *a = (struct t *) tshGetLinkedList(v, 0);
-    REQUIRE(a != NULL);
-    CHECK_EQ(tmp.x, a->x);
-    CHECK_EQ(tmp.y, a->y);
+    ASSERT_TRUE(a != NULL);
+    EXPECT_EQ(tmp.x, a->x);
+    EXPECT_EQ(tmp.y, a->y);
     v = tshRemoveLinkedList(v, 0);
     v = tshRemoveLinkedList(v, arr_size - 1);
 
     v = tshInsertLinkedList(v, &tmp, 4);
     a = (struct t*) tshGetLinkedList(v, 4);
-    REQUIRE(a != NULL);
-    CHECK_EQ(tmp.x, a->x);
-    CHECK_EQ(tmp.y, a->y);
+    ASSERT_TRUE(a != NULL);
+    EXPECT_EQ(tmp.x, a->x);
+    EXPECT_EQ(tmp.y, a->y);
     
 
     tshFreeLinkedList(v);
-    quit();
+    colls_quit();
 }
 
 TEST(collections, queue) { 
-    init();
+    colls_init();
     tshQueue *s = NULL;
     struct t arr[arr_size];
     for (int i = 0; i < arr_size; i++) {
@@ -72,26 +74,26 @@ TEST(collections, queue) {
         arr[i].y = ((float)rand() / RAND_MAX) * 100;
 
         s = tshEnqueue(s, (void*)&arr[i]);
-        REQUIRE(s != NULL);
+        ASSERT_TRUE(s != NULL);
     }
 
     size_t i = 0;
     while (!tshQueueIsEmpty(s)) {
         struct t *a;
         s = tshDequeue(s, (void**)&a);
-        CHECK_EQ(arr[i].x, a->x);
-        CHECK_EQ(arr[i].y, a->y);
+        EXPECT_EQ(arr[i].x, a->x);
+        EXPECT_EQ(arr[i].y, a->y);
         i += 1;
     }
 
-    CHECK(s == NULL);
+    EXPECT_TRUE(s == NULL);
 
     tshFreeQueue(s);
-    quit();
+    colls_quit();
 }
 
 TEST(collections, stack) { 
-    init();
+    colls_init();
      
     tshStack *s = NULL;
     struct t arr[arr_size];
@@ -100,30 +102,30 @@ TEST(collections, stack) {
         arr[i].y = ((float)rand() / RAND_MAX) * 100;
 
         s = tshPushStack(s, (void*)&arr[i]);
-        REQUIRE(s != NULL);
+        ASSERT_TRUE(s != NULL);
     }
 
     size_t i = arr_size - 1;
     while (!tshStackIsEmpty(s)) {
         struct t *a;
         s = tshPopStack(s, (void**)&a);
-        CHECK_EQ(arr[i].x, a->x);
-        CHECK_EQ(arr[i].y, a->y);
+        EXPECT_EQ(arr[i].x, a->x);
+        EXPECT_EQ(arr[i].y, a->y);
         i -= 1;
     }
 
-    CHECK(s == NULL);
+    EXPECT_TRUE(s == NULL);
 
     tshFreeStack(s);
-    quit();
+    colls_quit();
 }
 
 
 TEST(collections, vector) { 
-    init();
+    colls_init();
     tshVec v;
     tshInitVec(&v); 
-    REQUIRE(v._$$_ != NULL);
+    ASSERT_TRUE(v._$$_ != NULL);
 
     struct t arr[arr_size];
     for (int i = 0; i < arr_size; i++) {
@@ -133,26 +135,27 @@ TEST(collections, vector) {
         tshAppendVec(&v, (void*)&arr[i]);
     }
 
-    CHECK_EQ(v.capacity, 16384);
-    CHECK_EQ(v.size, arr_size);
+    EXPECT_EQ(v.capacity, 16384);
+    EXPECT_EQ(v.size, arr_size);
 
     for (int i = 0; i < arr_size; i++) {
         struct t *a = (struct t *)v._$$_[i];
-        CHECK_EQ(arr[i].x, a->x);
-        CHECK_EQ(arr[i].y, a->y);
+        EXPECT_EQ(arr[i].x, a->x);
+        EXPECT_EQ(arr[i].y, a->y);
     }
 
     tshRemoveVec(&v, arr_size - 1);
-    CHECK_EQ(v.size, arr_size - 1);
+    EXPECT_EQ(v.size, arr_size - 1);
 
-    tshInsertVec(&v, &((struct t){.x=1.3f, 3.4f}), 4);
+    struct t dummy = {.x=1.3f, .y=3.4f};
+    tshInsertVec(&v, &dummy, 4);
     struct t *val = (struct t*) tshGetVec(v, 4);
-    REQUIRE(val != NULL);
-    CHECK_EQ(val->x, 1.3f);
-    CHECK_EQ(val->y, 3.4f);
+    ASSERT_TRUE(val != NULL);
+    EXPECT_EQ(val->x, 1.3f);
+    EXPECT_EQ(val->y, 3.4f);
     
     tshFreeVec(v);
-    quit();
+    colls_quit();
 }
 
 // void tshInitHashTable(tshHashTable *table);
@@ -160,7 +163,7 @@ TEST(collections, vector) {
 // void tshRemoveashTable(tshHashTable *table, char* key);
 // void tshFreeHasTable(tshHashTable *table);
 TEST(collections, Hahstables)  {
-    init();
+    colls_init();
     tshHashTable table;
     tshInitHashTable(&table);
     struct t stuff[arr_size];
@@ -175,27 +178,27 @@ TEST(collections, Hahstables)  {
     for (int i = 0; i < arr_size; i++) {
         char key[20];
         sprintf(key, "key-%d", i);
-        struct t *val = tshHashTableGet(&table, key);
-        REQUIRE(val != NULL);
-        CHECK(tshHashTableHasKey(&table, key));
-        CHECK_EQ(val->x, stuff[i].x);
-        CHECK_EQ(val->y, stuff[i].y);
+        struct t *val = (struct t*) tshHashTableGet(&table, key);
+        ASSERT_TRUE(val != NULL);
+        EXPECT_TRUE(tshHashTableHasKey(&table, key));
+        EXPECT_EQ(val->x, stuff[i].x);
+        EXPECT_EQ(val->y, stuff[i].y);
     }
 
     tshRemoveHashTable(&table, "key-3");
-    CHECK(tshHashTableHasKey(&table, "key-3") == false);
+    EXPECT_TRUE(tshHashTableHasKey(&table, "key-3") == false);
     tshRemoveHashTable(&table, "key-22");
-    CHECK(tshHashTableHasKey(&table, "key-22") == false);
+    EXPECT_TRUE(tshHashTableHasKey(&table, "key-22") == false);
     tshRemoveHashTable(&table, "key-5");
-    CHECK(tshHashTableHasKey(&table, "key-5") == false);
+    EXPECT_TRUE(tshHashTableHasKey(&table, "key-5") == false);
     tshRemoveHashTable(&table, "key-16");
-    CHECK(tshHashTableHasKey(&table, "key-16") == false);
+    EXPECT_TRUE(tshHashTableHasKey(&table, "key-16") == false);
     tshRemoveHashTable(&table, "key-9");
-    CHECK(tshHashTableHasKey(&table, "key-9") == false);
+    EXPECT_TRUE(tshHashTableHasKey(&table, "key-9") == false);
 
 
     tshFreeHashTable(&table);
 
-    quit();
+    colls_quit();
 }
 
