@@ -39,11 +39,11 @@ target_link_libraries(Tanoshi
 
 target_include_directories(Tanoshi
     PRIVATE
+        external/clogger
         include/
         libs/collections/include
         libs/memory/include
         libs/managers/include
         libs/hashing/include
-        external/clogger
 )
 
