@@ -4,19 +4,18 @@ project(Tanoshi
     LANGUAGES C CXX
 )
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY, ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS, "ON")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
-    -lm \
     -Wall \
     -Werror \
     -g \
 ")
+
+file(GLOB SOURCES
+    ${PROJECT_SOURCE_DIR}/src/*.c
+)
 
 add_subdirectory(libs/collections)
 add_subdirectory(libs/memory)
@@ -24,7 +23,10 @@ add_subdirectory(libs/managers)
 add_subdirectory(libs/hashing)
 add_subdirectory(test)
 
-add_executable(Tanoshi apps/cli/src/main.c)
+add_executable(Tanoshi 
+    ${SOURCES}
+    apps/cli/src/main.c
+)
 
 target_link_libraries(Tanoshi
     PRIVATE
@@ -32,11 +34,12 @@ target_link_libraries(Tanoshi
         memory
         managers
         hashing
+        m
 )
 
 target_include_directories(Tanoshi
     PRIVATE
-        ./include/
+        include/
         libs/collections/include
         libs/memory/include
         libs/managers/include

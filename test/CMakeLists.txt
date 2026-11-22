@@ -7,8 +7,14 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+file(GLOB SOURCES
+    ${PROJECT_SOURCE_DIR}/src/*.c
+)
+
 add_executable(tanoshi_test
+    ${SOURCES}
     collections_test.cpp
+    strings_test.cpp
     main_test.cpp
 )
 
@@ -29,3 +35,4 @@ target_link_libraries(tanoshi_test
 
 include(GoogleTest)
 gtest_discover_tests(tanoshi_test)
+

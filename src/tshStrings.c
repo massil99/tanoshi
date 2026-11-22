@@ -41,8 +41,6 @@ void tshStringAppend(tshString* s, char c) {
 
 void tshStringCat(tshString* first, tshString* last, tshString* dist) {
     tshStringNew(dist);
-
-
 }
 
 void tshSubString(const tshString* s, const u32 start, const u32 size, tshString *ret) {
